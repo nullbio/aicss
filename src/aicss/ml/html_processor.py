@@ -1025,6 +1025,23 @@ def process_ai_tags(html_content: str) -> str:
                     new_text = re.sub(r'content "([^"]*)"', r'\1', element)
                     element.replace_with(new_text)
         
+        # 5. Fix empty elements - add placeholder content
+        for tag_name in ['div', 'a', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'button']:
+            for element in final_soup.find_all(tag_name):
+                # Check if element is empty (no text and no child elements with content)
+                if not element.get_text(strip=True) and not [x for x in element.find_all() if x.get_text(strip=True)]:
+                    # Skip empty elements with aicss attribute - these might be intentional styling containers
+                    if not element.has_attr('aicss') or (element.has_attr('aicss') and len(element.get('aicss', '')) == 0):
+                        # Add appropriate placeholder content based on element type
+                        if tag_name == 'a':
+                            element.string = "Link"
+                        elif tag_name == 'button':
+                            element.string = "Button"
+                        elif tag_name.startswith('h'):
+                            element.string = f"Heading {tag_name[1]}"
+                        else:
+                            element.string = "Content placeholder"
+        
         # Use the cleaned soup as the final HTML
         processed_html = str(final_soup)
         

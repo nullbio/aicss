@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursive AI Elements Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+        /* Add styles for classes that will be needed */
+        .form-group { margin-bottom: 1rem; }
+        .contact-form { background: white; padding: 1rem; }
+        .row { display: flex; }
+    </style>
+</head>
+<body>
+    <h1>Recursive AI Elements Test</h1>
+    <p>This file tests recursive processing of AI elements, which is a common point of failure.</p>
+
+    <!-- Test 1: Basic nested ai elements -->
+    <div class="test-section">
+        <h2>Basic Nested AI Elements</h2>
+        <aidiv>content "
+            <div>
+                <h3>Level 1 AI Element</h3>
+                <aidiv>content 'This is a nested AI div' with style 'background blue, color white, padding medium'</aidiv>
+            </div>
+        " with style "padding large, background light gray, rounded corners"</aidiv>
+    </div>
+
+    <!-- Test 2: Multiple levels of nesting -->
+    <div class="test-section">
+        <h2>Multiple Levels of Nesting</h2>
+        <aidiv>content "
+            <div>
+                <h3>Level 1 AI Element</h3>
+                <aidiv>content '
+                    <div>
+                        <h4>Level 2 AI Element</h4>
+                        <aidiv>content \"
+                            <div>
+                                <h5>Level 3 AI Element</h5>
+                                <p>This is the deepest level</p>
+                            </div>
+                        \" with style \"background purple, color white, padding small, rounded corners\"</aidiv>
+                    </div>
+                ' with style 'background blue, color white, padding medium, rounded corners'</aidiv>
+            </div>
+        " with style "padding large, background light gray, rounded corners"</aidiv>
+    </div>
+
+    <!-- Test 3: Different AI element types nested -->
+    <div class="test-section">
+        <h2>Different AI Element Types Nested</h2>
+        <aidiv>content "
+            <div>
+                <h3>Container with Nested Elements</h3>
+                <aibutton>text 'Click Me' with style 'background blue, color white, padding small medium, rounded corners'</aibutton>
+                <aip>text 'This is a paragraph inside an AI div' with style 'color dark gray, margin top medium'</aip>
+            </div>
+        " with style "padding large, background light gray, rounded corners"</aidiv>
+    </div>
+
+    <!-- Test 4: Deeply nested mixed content -->
+    <div class="test-section">
+        <h2>Deeply Nested Mixed Content</h2>
+        <aidiv>content "
+            <div>
+                <h3>Mixed Content Container</h3>
+                <div>
+                    <aibutton>text 'Normal Button' with style 'background blue, color white, padding small medium, rounded corners'</aibutton>
+                    <aidiv>content '
+                        <div>
+                            <h4>Nested Container</h4>
+                            <aibutton>text \"Inner Button\" with style \"background red, color white, padding small medium, rounded corners\"</aibutton>
+                            <p>Regular paragraph</p>
+                            <aip>text \"AI paragraph in deep nesting\" with style \"color blue, font weight bold\"</aip>
+                        </div>
+                    ' with style 'background light blue, padding medium, rounded corners, margin top medium'</aidiv>
+                </div>
+            </div>
+        " with style "padding large, background light gray, rounded corners"</aidiv>
+    </div>
+
+    <!-- Test 5: Multiple passes needed (AI elements in aihtml) -->
+    <div class="test-section">
+        <h2>Multiple Passes Needed</h2>
+        <aihtml>
+            contact form with aicss="white background, light gray border, rounded corners, shadow, padding large".
+            submit button with aicss="background blue, color white, padding small medium, rounded corners"
+        </aihtml>
+
+        <aidiv>content "
+            <aihtml>
+                navigation with aicss=\"dark background, white text, padding medium\"
+            </aihtml>
+        " with style "margin top medium"</aidiv>
+    </div>
+
+    <!-- Test 6: Self-closing AI tags inside AI content -->
+    <div class="test-section">
+        <h2>Self-closing AI Tags</h2>
+        <aidiv>content "
+            <div>
+                <h3>Container with Self-closing Tags</h3>
+                <aiimg src='https://via.placeholder.com/300x200' alt='Placeholder' with style='max width 100%, border radius medium, shadow'/>
+                <p>Text after self-closing tag</p>
+            </div>
+        " with style "padding large, background light gray, rounded corners"</aidiv>
+    </div>
+
+    <!-- Test 7: Attributes with AI tags inside -->
+    <div class="test-section">
+        <h2>Attributes with AI Tags</h2>
+        <div aicss="padding large, background light gray, rounded corners">
+            <h3>Container with Elements That Have AI Elements in Attributes</h3>
+            <div data-content="<aibutton>text 'Button in attribute' with style 'background blue, color white'</aibutton>">
+                This has an AI element in an attribute (should not be processed)
+            </div>
+        </div>
+    </div>
+
+    <!-- Test 8: AI tags in comments -->
+    <div class="test-section">
+        <h2>AI Tags in Comments</h2>
+        <div aicss="padding large, background light gray, rounded corners">
+            <h3>Container with AI Tags in Comments</h3>
+            <!-- <aibutton>text 'Button in comment' with style 'background blue, color white'</aibutton> -->
+            <p>The AI button in the comment above should not be processed</p>
+        </div>
+    </div>
+
+    <!-- Test 9: String quoting edge cases -->
+    <div class="test-section">
+        <h2>String Quoting Edge Cases</h2>
+        <aidiv>content "
+            <div>
+                <h3>Container with Tricky Quoting</h3>
+                <p>This has 'single quotes' and \"double quotes\" in content</p>
+                <aibutton>text 'Button with \"quotes\" inside' with style 'background blue, color white, padding small'</aibutton>
+            </div>
+        " with style "padding large, background light gray, rounded corners"</aidiv>
+    </div>
+
+    <!-- Test 10: Complex scenario with multiple quoting and nesting levels -->
+    <div class="test-section">
+        <h2>Complex Scenario</h2>
+        <aidiv>content "
+            <section>
+                <h3>Complex Layout with Multiple AI Elements</h3>
+                <div class='row'>
+                    <aidiv>content '
+                        <article>
+                            <h4>Card 1</h4>
+                            <p>Description for card 1</p>
+                            <aibutton>text \"Action Button 1\" with style \"background primary, color white, padding small medium, rounded corners small\"</aibutton>
+                        </article>
+                    ' with style 'background white, padding medium, rounded corners, shadow, margin right medium'</aidiv>
+                    
+                    <aidiv>content '
+                        <article>
+                            <h4>Card 2</h4>
+                            <p>Description for card 2</p>
+                            <div>
+                                <aibutton>text \"Action Button 2\" with style \"background secondary, color white, padding small medium, rounded corners small\"</aibutton>
+                            </div>
+                        </article>
+                    ' with style 'background white, padding medium, rounded corners, shadow'</aidiv>
+                </div>
+                
+                <aifooter>content 'Footer text with <em>emphasis</em>' with style 'margin top large, text align center, color gray'</aifooter>
+            </section>
+        " with style "padding large, background light gray, rounded corners"</aidiv>
+    </div>
+</body>
+</html>

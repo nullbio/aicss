@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nested Structures Test</title>
+    <aistyle>
+        body class: font family Arial, line height 1.6, margin 0, padding 0
+        .container: max width 1200px, margin 0 auto, padding 20px
+        .card: background white, border radius medium, shadow medium, overflow hidden
+        .form-group: margin-bottom 1rem
+        .contact-form: padding 1rem, background white
+    </aistyle>
+</head>
+<body>
+    <div class="container">
+        <h1 aicss="text center, margin bottom large, primary color">Nested Structures Test</h1>
+
+        <!-- Test 1: Deep nesting with aicss attributes -->
+        <div aicss="padding large, margin bottom large, background light gray, rounded corners">
+            <div aicss="padding medium, background white, rounded corners">
+                <h2 aicss="color blue, margin bottom medium">Deeply Nested Elements with AICSS</h2>
+                <div aicss="display flex, gap medium">
+                    <div aicss="flex 1, padding small, background light blue, rounded corners">
+                        <p aicss="margin bottom small">Level 1 content</p>
+                        <div aicss="padding small, background lighter blue, rounded corners">
+                            <p aicss="margin bottom small">Level 2 content</p>
+                            <div aicss="padding small, background lightest blue, rounded corners">
+                                <p aicss="margin 0">Level 3 content</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div aicss="flex 1, padding small, background light green, rounded corners">
+                        <p aicss="margin bottom small">Sibling content</p>
+                        <div aicss="padding small, background lighter green, rounded corners">
+                            <p aicss="margin 0">Nested sibling content</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test 2: Nested AI elements -->
+        <div aicss="padding large, margin bottom large, background light yellow, rounded corners">
+            <h2 aicss="color orange, margin bottom medium">Nested AI Elements</h2>
+            <aidiv>content "
+                <div>
+                    <h3>Level 1 AI Content</h3>
+                    <aidiv>content '
+                        <div>
+                            <h4>Level 2 AI Content</h4>
+                            <aidiv>content \"
+                                <div>
+                                    <h5>Level 3 AI Content</h5>
+                                    <p>Deeply nested AI element</p>
+                                </div>
+                            \" with style \"background lightest purple, padding small, rounded corners\"</aidiv>
+                        </div>
+                    ' with style 'background lighter purple, padding medium, rounded corners, margin bottom small'</aidiv>
+                </div>
+            " with style "background light purple, padding large, rounded corners"</aidiv>
+        </div>
+
+        <!-- Test 3: Mix of regular HTML, aicss attributes, and AI elements -->
+        <div class="card" aicss="margin bottom large">
+            <header aicss="background primary color, color white, padding medium">
+                <h2>Mixed Structure Test</h2>
+            </header>
+            <div aicss="padding large">
+                <div aicss="display flex, gap large">
+                    <div aicss="flex 1">
+                        <h3 aicss="color primary, margin bottom medium">Regular HTML with AICSS</h3>
+                        <p aicss="margin bottom medium">This section uses regular HTML with AICSS attributes.</p>
+                        <button aicss="primary color background, white text, padding small medium, rounded corners, border none">
+                            Regular Button
+                        </button>
+                    </div>
+                    <div aicss="flex 1">
+                        <h3 aicss="color secondary, margin bottom medium">AI Elements Section</h3>
+                        <aip>text "This section uses AI elements." with style "margin bottom medium"</aip>
+                        <aibutton>text "AI Button" with style "secondary color background, white text, padding small medium, rounded corners, border none"</aibutton>
+                    </div>
+                </div>
+            </div>
+            <footer aicss="background light gray, padding medium, text center">
+                <p aicss="margin 0, color dark gray">Card Footer</p>
+            </footer>
+        </div>
+
+        <!-- Test 4: Complex layout with nested components -->
+        <div aicss="display grid, grid template columns 1fr 2fr, gap large, margin bottom large">
+            <aside aicss="background light gray, padding large, rounded corners">
+                <h3 aicss="margin bottom medium, color primary">Sidebar</h3>
+                <nav aicss="display flex, flex direction column, gap medium">
+                    <a href="#" aicss="color primary, text decoration none, padding small, border bottom light">Link 1</a>
+                    <a href="#" aicss="color primary, text decoration none, padding small, border bottom light">Link 2</a>
+                    <a href="#" aicss="color primary, text decoration none, padding small, border bottom light">Link 3</a>
+                </nav>
+                <div aicss="margin top large">
+                    <aidiv>content "<div class='widget'><h4>AI Widget</h4><p>Widget content here</p></div>" with style "background white, padding medium, rounded corners, shadow, margin top medium"</aidiv>
+                </div>
+            </aside>
+            <main aicss="background white, padding large, rounded corners, shadow">
+                <h2 aicss="margin bottom medium, color primary">Main Content</h2>
+                <div aicss="display grid, grid template columns 1fr 1fr, gap medium, margin bottom large">
+                    <div aicss="background lightest gray, padding medium, rounded corners">
+                        <h3 aicss="margin bottom small, color dark">Regular Section 1</h3>
+                        <p aicss="margin bottom medium">Content for section 1</p>
+                        <button aicss="background primary, color white, padding small, rounded corners, border none">Action</button>
+                    </div>
+                    <aidiv>content "
+                        <div>
+                            <h3>AI Section 2</h3>
+                            <p>Content for AI section</p>
+                            <aibutton>text 'AI Action' with style 'background secondary, color white, padding small, rounded corners, border none'</aibutton>
+                        </div>
+                    " with style "background lightest blue, padding medium, rounded corners"</aidiv>
+                </div>
+                <div aicss="background lightest green, padding large, rounded corners, margin top large">
+                    <h3 aicss="margin bottom medium">Deeply Nested Example</h3>
+                    <div aicss="display flex, gap medium">
+                        <div aicss="flex 1, background white, padding medium, rounded corners, shadow">
+                            <h4 aicss="margin bottom small">Subsection 1</h4>
+                            <p aicss="margin bottom medium">Content here</p>
+                            <div aicss="background lightest yellow, padding small, rounded corners">
+                                <p aicss="margin 0, font size small">Nested content</p>
+                            </div>
+                        </div>
+                        <div aicss="flex 1, background white, padding medium, rounded corners, shadow">
+                            <aihtml>
+                                contact form with aicss="padding small, margin 0".
+                                submit button with aicss="primary color background, white text, small padding, rounded small"
+                            </aihtml>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

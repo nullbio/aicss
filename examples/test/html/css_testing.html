@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Testing</title>
+    <aistyle>
+        body class: font-family Arial, line-height 1.6, margin 0, padding 2rem
+        .container: max-width 1200px, margin 0 auto, padding 1rem
+        .section: margin-bottom 2rem, padding 1rem
+        h1, h2, h3: margin-bottom 1rem
+    </aistyle>
+</head>
+<body>
+    <div class="container">
+        <h1>CSS Property Testing</h1>
+        <p>This file tests all CSS properties and values supported by AICSS.</p>
+
+        <!-- Colors -->
+        <div class="section">
+            <h2>Color Properties</h2>
+            
+            <div aicss="color red, margin-bottom 1rem">Text color: red</div>
+            <div aicss="color blue, margin-bottom 1rem">Text color: blue</div>
+            <div aicss="color green, margin-bottom 1rem">Text color: green</div>
+            <div aicss="color yellow, margin-bottom 1rem">Text color: yellow</div>
+            <div aicss="color purple, margin-bottom 1rem">Text color: purple</div>
+            <div aicss="color cyan, margin-bottom 1rem">Text color: cyan</div>
+            <div aicss="color magenta, margin-bottom 1rem">Text color: magenta</div>
+            <div aicss="color white, background black, margin-bottom 1rem">Text color: white</div>
+            <div aicss="color black, margin-bottom 1rem">Text color: black</div>
+            <div aicss="color gray, margin-bottom 1rem">Text color: gray</div>
+            <div aicss="color orange, margin-bottom 1rem">Text color: orange</div>
+            <div aicss="color pink, margin-bottom 1rem">Text color: pink</div>
+            <div aicss="color brown, margin-bottom 1rem">Text color: brown</div>
+            <div aicss="color navy, margin-bottom 1rem">Text color: navy</div>
+            <div aicss="color teal, margin-bottom 1rem">Text color: teal</div>
+            <div aicss="color primary, margin-bottom 1rem">Text color: primary</div>
+            <div aicss="color secondary, margin-bottom 1rem">Text color: secondary</div>
+            <div aicss="color success, margin-bottom 1rem">Text color: success</div>
+            <div aicss="color danger, margin-bottom 1rem">Text color: danger</div>
+            <div aicss="color warning, margin-bottom 1rem">Text color: warning</div>
+            <div aicss="color info, margin-bottom 1rem">Text color: info</div>
+            
+            <div aicss="background-color red, color white, padding 0.5rem, margin-bottom 1rem">Background color: red</div>
+            <div aicss="background-color blue, color white, padding 0.5rem, margin-bottom 1rem">Background color: blue</div>
+            <div aicss="background-color green, color white, padding 0.5rem, margin-bottom 1rem">Background color: green</div>
+            <div aicss="background-color yellow, color black, padding 0.5rem, margin-bottom 1rem">Background color: yellow</div>
+            <div aicss="background-color purple, color white, padding 0.5rem, margin-bottom 1rem">Background color: purple</div>
+            <div aicss="background-color cyan, color black, padding 0.5rem, margin-bottom 1rem">Background color: cyan</div>
+            <div aicss="background-color magenta, color white, padding 0.5rem, margin-bottom 1rem">Background color: magenta</div>
+            <div aicss="background-color white, color black, padding 0.5rem, margin-bottom 1rem">Background color: white</div>
+            <div aicss="background-color black, color white, padding 0.5rem, margin-bottom 1rem">Background color: black</div>
+            <div aicss="background-color gray, color white, padding 0.5rem, margin-bottom 1rem">Background color: gray</div>
+            <div aicss="background-color transparent, color black, padding 0.5rem, border 1px solid black, margin-bottom 1rem">Background color: transparent</div>
+            <div aicss="background-color primary, color white, padding 0.5rem, margin-bottom 1rem">Background color: primary</div>
+            <div aicss="background-color secondary, color white, padding 0.5rem, margin-bottom 1rem">Background color: secondary</div>
+        </div>
+
+        <!-- Typography -->
+        <div class="section">
+            <h2>Typography Properties</h2>
+            
+            <div aicss="font-size tiny, margin-bottom 1rem">Font size: tiny</div>
+            <div aicss="font-size very small, margin-bottom 1rem">Font size: very small</div>
+            <div aicss="font-size small, margin-bottom 1rem">Font size: small</div>
+            <div aicss="font-size medium, margin-bottom 1rem">Font size: medium</div>
+            <div aicss="font-size large, margin-bottom 1rem">Font size: large</div>
+            <div aicss="font-size very large, margin-bottom 1rem">Font size: very large</div>
+            <div aicss="font-size huge, margin-bottom 1rem">Font size: huge</div>
+            <div aicss="font-size enormous, margin-bottom 1rem">Font size: enormous</div>
+            
+            <div aicss="font-weight normal, margin-bottom 1rem">Font weight: normal</div>
+            <div aicss="font-weight bold, margin-bottom 1rem">Font weight: bold</div>
+            <div aicss="font-weight bolder, margin-bottom 1rem">Font weight: bolder</div>
+            <div aicss="font-weight lighter, margin-bottom 1rem">Font weight: lighter</div>
+            
+            <div aicss="text-align left, margin-bottom 1rem">Text align: left</div>
+            <div aicss="text-align center, margin-bottom 1rem">Text align: center</div>
+            <div aicss="text-align right, margin-bottom 1rem">Text align: right</div>
+            <div aicss="text-align justify, margin-bottom 1rem">Text align: justify. This text is long enough to demonstrate justified alignment across multiple lines of text content.</div>
+        </div>
+
+        <!-- Spacing -->
+        <div class="section">
+            <h2>Spacing Properties</h2>
+            
+            <div aicss="padding none, border 1px solid black, margin-bottom 1rem">Padding: none</div>
+            <div aicss="padding tiny, border 1px solid black, margin-bottom 1rem">Padding: tiny</div>
+            <div aicss="padding very small, border 1px solid black, margin-bottom 1rem">Padding: very small</div>
+            <div aicss="padding small, border 1px solid black, margin-bottom 1rem">Padding: small</div>
+            <div aicss="padding medium, border 1px solid black, margin-bottom 1rem">Padding: medium</div>
+            <div aicss="padding large, border 1px solid black, margin-bottom 1rem">Padding: large</div>
+            <div aicss="padding very large, border 1px solid black, margin-bottom 1rem">Padding: very large</div>
+            <div aicss="padding huge, border 1px solid black, margin-bottom 1rem">Padding: huge</div>
+            <div aicss="padding enormous, border 1px solid black, margin-bottom 1rem">Padding: enormous</div>
+            
+            <div style="border: 1px solid black;">
+                <div aicss="margin none, background-color red, color white">Margin: none</div>
+            </div>
+            <div style="border: 1px solid black; margin-top: 1rem;">
+                <div aicss="margin tiny, background-color red, color white">Margin: tiny</div>
+            </div>
+            <div style="border: 1px solid black; margin-top: 1rem;">
+                <div aicss="margin very small, background-color red, color white">Margin: very small</div>
+            </div>
+            <div style="border: 1px solid black; margin-top: 1rem;">
+                <div aicss="margin small, background-color red, color white">Margin: small</div>
+            </div>
+            <div style="border: 1px solid black; margin-top: 1rem;">
+                <div aicss="margin medium, background-color red, color white">Margin: medium</div>
+            </div>
+            <div style="border: 1px solid black; margin-top: 1rem;">
+                <div aicss="margin large, background-color red, color white">Margin: large</div>
+            </div>
+        </div>
+
+        <!-- Borders and Radius -->
+        <div class="section">
+            <h2>Border and Border Radius Properties</h2>
+            
+            <div aicss="border-radius none, background-color light gray, padding medium, margin-bottom 1rem">Border radius: none</div>
+            <div aicss="border-radius tiny, background-color light gray, padding medium, margin-bottom 1rem">Border radius: tiny</div>
+            <div aicss="border-radius very small, background-color light gray, padding medium, margin-bottom 1rem">Border radius: very small</div>
+            <div aicss="border-radius small, background-color light gray, padding medium, margin-bottom 1rem">Border radius: small</div>
+            <div aicss="border-radius medium, background-color light gray, padding medium, margin-bottom 1rem">Border radius: medium</div>
+            <div aicss="border-radius large, background-color light gray, padding medium, margin-bottom 1rem">Border radius: large</div>
+            <div aicss="border-radius very large, background-color light gray, padding medium, margin-bottom 1rem">Border radius: very large</div>
+            <div aicss="border-radius huge, background-color light gray, padding medium, margin-bottom 1rem">Border radius: huge</div>
+            <div aicss="border-radius enormous, background-color light gray, padding medium, margin-bottom 1rem">Border radius: enormous</div>
+        </div>
+
+        <!-- Display -->
+        <div class="section">
+            <h2>Display Properties</h2>
+            
+            <div aicss="display block, background-color light gray, padding medium, margin-bottom 1rem">Display: block</div>
+            <span aicss="display inline, background-color light gray, padding medium, margin-right 1rem">Display: inline</span>
+            <span aicss="display inline-block, background-color light gray, padding medium, margin-right 1rem">Display: inline-block</span>
+            <div aicss="display flex, background-color light gray, padding medium, margin-bottom 1rem">
+                <div aicss="background-color blue, color white, padding small, margin small">Flex item 1</div>
+                <div aicss="background-color green, color white, padding small, margin small">Flex item 2</div>
+                <div aicss="background-color red, color white, padding small, margin small">Flex item 3</div>
+            </div>
+            <div aicss="display grid, grid-template-columns 1fr 1fr 1fr, gap medium, background-color light gray, padding medium, margin-bottom 1rem">
+                <div aicss="background-color blue, color white, padding small">Grid item 1</div>
+                <div aicss="background-color green, color white, padding small">Grid item 2</div>
+                <div aicss="background-color red, color white, padding small">Grid item 3</div>
+                <div aicss="background-color yellow, color black, padding small">Grid item 4</div>
+                <div aicss="background-color purple, color white, padding small">Grid item 5</div>
+                <div aicss="background-color cyan, color black, padding small">Grid item 6</div>
+            </div>
+            <div aicss="display none, background-color light gray, padding medium, margin-bottom 1rem">Display: none (should not be visible)</div>
+        </div>
+
+        <!-- Position -->
+        <div class="section">
+            <h2>Position Properties</h2>
+            
+            <div style="position: relative; height: 200px; background-color: #f5f5f5; border: 1px solid #ddd; margin-bottom: 1rem;">
+                <div aicss="position static, background-color blue, color white, padding small, margin-bottom 0.5rem">Position: static</div>
+                <div aicss="position relative, top 20px, left 20px, background-color green, color white, padding small, margin-bottom 0.5rem">Position: relative</div>
+                <div aicss="position absolute, top 80px, right 20px, background-color red, color white, padding small">Position: absolute</div>
+                <div aicss="position fixed, bottom 20px, right 20px, background-color purple, color white, padding small, z-index 100">Position: fixed</div>
+                <div aicss="position sticky, top 0, background-color orange, color white, padding small">Position: sticky</div>
+            </div>
+        </div>
+
+        <!-- Dimensions -->
+        <div class="section">
+            <h2>Dimension Properties</h2>
+            
+            <div aicss="width auto, background-color light gray, padding medium, margin-bottom 1rem">Width: auto</div>
+            <div aicss="width full, background-color light gray, padding medium, margin-bottom 1rem">Width: full (100%)</div>
+            <div aicss="width half, background-color light gray, padding medium, margin-bottom 1rem">Width: half (50%)</div>
+            <div aicss="width third, background-color light gray, padding medium, margin-bottom 1rem">Width: third (33.333%)</div>
+            <div aicss="width quarter, background-color light gray, padding medium, margin-bottom 1rem">Width: quarter (25%)</div>
+            
+            <div style="height: 400px; background-color: #f5f5f5; border: 1px solid #ddd; margin-bottom: 1rem; position: relative;">
+                <div aicss="height auto, width quarter, background-color blue, color white, padding medium">Height: auto</div>
+                <div aicss="height full, width quarter, background-color green, color white, padding medium, position absolute, left 25%">Height: full (100%)</div>
+                <div aicss="height half, width quarter, background-color red, color white, padding medium, position absolute, left 50%">Height: half (50%)</div>
+                <div aicss="height third, width quarter, background-color purple, color white, padding medium, position absolute, left 75%">Height: third (33.333%)</div>
+            </div>
+        </div>
+
+        <!-- Style Patterns -->
+        <div class="section">
+            <h2>Style Patterns</h2>
+            
+            <div aicss="centered, padding medium, background-color light gray, margin-bottom 1rem">
+                <p>This content is centered (display: flex, justify-content: center, align-items: center)</p>
+            </div>
+            
+            <div aicss="shadow, padding medium, background-color white, margin-bottom 1rem">
+                <p>This element has a shadow (box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2))</p>
+            </div>
+            
+            <div aicss="rounded, padding medium, background-color light gray, margin-bottom 1rem">
+                <p>This element has rounded corners (border-radius: 0.25rem)</p>
+            </div>
+            
+            <div aicss="no-border, padding medium, background-color light gray, margin-bottom 1rem">
+                <p>This element has no border (border: none)</p>
+            </div>
+            
+            <div aicss="centered, shadow, rounded, padding medium, background-color white, margin-bottom 1rem">
+                <p>This element combines multiple patterns: centered, shadow, rounded</p>
+            </div>
+        </div>
+
+        <!-- Combined Properties -->
+        <div class="section">
+            <h2>Combined Properties</h2>
+            
+            <div aicss="background-color primary, color white, padding large, border-radius large, shadow, text-align center, margin-bottom 1rem">
+                <h3>Primary Card</h3>
+                <p>This element combines multiple properties for a polished look.</p>
+            </div>
+            
+            <div aicss="background-color secondary, color white, padding large, border-radius large, shadow, text-align center, margin-bottom 1rem">
+                <h3>Secondary Card</h3>
+                <p>This element combines multiple properties for a polished look.</p>
+            </div>
+            
+            <div aicss="display flex, justify-content space-between, align-items center, background-color light gray, padding medium, border-radius medium, margin-bottom 1rem">
+                <div aicss="flex 1, padding small">
+                    <h3>Flex Layout</h3>
+                    <p>This is a flex layout with multiple properties.</p>
+                </div>
+                <div aicss="flex 1, padding small, text-align right">
+                    <button aicss="background-color primary, color white, padding small medium, border-radius small, border none, cursor pointer">Button</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

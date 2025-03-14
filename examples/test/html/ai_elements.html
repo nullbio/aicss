@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Elements Test</title>
+</head>
+<body>
+    <h1>AI Elements Comprehensive Test</h1>
+
+    <!-- Test all AI HTML tag variants -->
+    <h2>Basic AI HTML Elements</h2>
+
+    <!-- aidiv -->
+    <aidiv>content "This is a basic div" with style "blue background, white text, padding medium, rounded corners"</aidiv>
+
+    <!-- aip -->
+    <aip>text "This is a paragraph" with style "color black, line height 1.8, font size medium"</aip>
+
+    <!-- aih1 through aih6 -->
+    <aih1>text "This is an H1" with style "color red, text center, margin top large"</aih1>
+    <aih2>text "This is an H2" with style "color green, text center"</aih2>
+    <aih3>text "This is an H3" with style "color blue, text center"</aih3>
+    <aih4>text "This is an H4" with style "color purple, text center"</aih4>
+    <aih5>text "This is an H5" with style "color orange, text center"</aih5>
+    <aih6>text "This is an H6" with style "color pink, text center"</aih6>
+
+    <!-- aia (anchor) -->
+    <aia>href "#" text "This is a link" with style "color blue, text decoration none, bold"</aia>
+
+    <!-- aibutton -->
+    <aibutton>text "This is a button" with style "blue background, white text, padding medium, rounded corners, bold"</aibutton>
+
+    <!-- aiimg -->
+    <aiimg>src "https://via.placeholder.com/150" alt "Placeholder" with style "border radius medium, shadow, max width 100%"</aiimg>
+
+    <!-- aitable -->
+    <aidiv>content "<table><tr><td>Simple</td><td>Table</td></tr></table>" with style "width 100%, border collapse collapse"</aidiv>
+
+    <!-- aiul -->
+    <aidiv>content "<ul><li>List item 1</li><li>List item 2</li></ul>" with style "padding left large, margin top medium"</aidiv>
+
+    <!-- aiol -->
+    <aidiv>content "<ol><li>Ordered item 1</li><li>Ordered item 2</li></ol>" with style "padding left large, margin top medium"</aidiv>
+
+    <!-- aiinput -->
+    <aiinput>type "text" placeholder "Input field" with style "width 100%, padding small, rounded corners"</aiinput>
+
+    <!-- aitextarea -->
+    <aitextarea>placeholder "Enter text here" with style "width 100%, height 100px, padding small, rounded corners"</aitextarea>
+
+    <!-- aiselect as div with content -->
+    <aidiv>content "<select><option>Option 1</option><option>Option 2</option></select>" with style "width 100%, padding small, rounded corners"</aidiv>
+
+    <!-- aiform -->
+    <aidiv>content "<form><input type='text' placeholder='Name'><input type='submit' value='Submit'></form>" with style "padding medium, background light gray, rounded corners"</aidiv>
+
+    <!-- ainav -->
+    <aidiv>content "<nav><a href='#'>Home</a> <a href='#'>About</a> <a href='#'>Contact</a></nav>" with style "background dark blue, padding medium, color white"</aidiv>
+
+    <!-- aifooter -->
+    <aidiv>content "<footer>Footer content</footer>" with style "background dark gray, color white, padding medium, text center"</aidiv>
+
+    <!-- aiheader -->
+    <aidiv>content "<header>Header content</header>" with style "background dark blue, color white, padding medium, text center"</aidiv>
+
+    <!-- aisection -->
+    <aidiv>content "<section>Section content</section>" with style "padding large, margin top medium, border light gray"</aidiv>
+
+    <!-- aiarticle -->
+    <aidiv>content "<article>Article content</article>" with style "padding large, margin top medium, border light gray"</aidiv>
+
+    <!-- aiaside -->
+    <aidiv>content "<aside>Aside content</aside>" with style "padding medium, background light gray, width 30%"</aidiv>
+
+    <h2>AI HTML Tag for Element Generation</h2>
+    <aihtml>
+        contact form with aicss="white background, light gray border, rounded corners, shadow, padding large".
+        submit button with aicss="primary color background, white text, bold, rounded"
+    </aihtml>
+
+    <aihtml>
+        navigation with aicss="dark background, white text, padding medium" 
+    </aihtml>
+
+    <aihtml>
+        gallery with aicss="flex, gap medium, wrap, justify content center"
+    </aihtml>
+
+    <h2>AI Style Tags in Head Section</h2>
+    <div class="test-element1">Styled by aistyle in head</div>
+    <div class="test-element2">Styled by aistyle in head</div>
+    
+    <style type="text/css">
+    /* Add some predefined styles for classes we know need to exist */
+    .logo { display: block; }
+    .caption { font-style: italic; }
+    .gallery-item { display: inline-block; }
+    .test-element1 { color: blue; }
+    .test-element2 { color: green; }
+    .navbar { background: #333; }
+    .gallery { display: flex; }
+    .nav-links { list-style: none; }
+    .contact-form { padding: 1rem; }
+    .form-group { margin-bottom: 1rem; }
+    </style>
+
+    <h2>Nested AI Elements</h2>
+    <aidiv>content "<div><aip>text 'Nested paragraph' with style 'color blue, bold'</aip></div>" with style "padding large, border gray"</aidiv>
+
+    <aidiv>
+        content "
+            <div>
+                <aibutton>text 'Nested button' with style 'red background, white text, bold'</aibutton>
+                <aia>href '#' text 'Nested link' with style 'color green, bold'</aia>
+            </div>
+        " 
+        with style "padding large, border gray"
+    </aidiv>
+
+    <h2>Edge Cases</h2>
+    
+    <!-- Empty AI element -->
+    <aidiv>with style "height 50px, background red"</aidiv>
+    
+    <!-- AI element with special characters -->
+    <aip>text "Special chars: !@#$%^&*()" with style "color blue, bold"</aip>
+    
+    <!-- AI element with very long style description -->
+    <aidiv>content "Long style test" with style "color red, background blue, padding large, margin small, border radius huge, shadow large, text center, font size large, font weight bold, line height 2, text transform uppercase, letter spacing wide, border solid 1px black, position relative, display flex, justify content center, align items center, flex direction column, opacity 0.9, overflow hidden"</aidiv>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edge Cases Test</title>
+    <!-- Multiple aistyle tags -->
+    <aistyle>
+        body class: font family Arial, line height 1.6
+    </aistyle>
+    <aistyle>
+        .test-case: border 1px solid gray, padding 1rem, margin-bottom 1rem
+        .test-cases: display block, margin 0, padding 0
+        .red-background: background-color red
+        .duplicate-selector: color blue
+        .quoted-class: font-weight bold
+    </aistyle>
+    
+    <!-- Add some default styles for classes used in edge cases -->
+    <style>
+        /* Classes for AI content */
+        .ai-generated { display: block; }
+        .ai-paragraph { margin-bottom: 1rem; }
+        .logo { display: block; }
+        .preserved-class { background-color: #f0f8ff; }
+    </style>
+</head>
+<body>
+    <h1>Edge Cases Test</h1>
+    
+    <div class="test-cases">
+        <!-- Test case 1: Empty aicss attribute -->
+        <div class="test-case">
+            <h2>Empty AICSS Attribute</h2>
+            <div aicss="">This element has an empty aicss attribute</div>
+        </div>
+        
+        <!-- Test case 2: AICSS with invalid or unknown properties -->
+        <div class="test-case">
+            <h2>Invalid Properties</h2>
+            <div aicss="nonexistent property, invalid value, foo bar baz">This element has invalid CSS properties</div>
+        </div>
+        
+        <!-- Test case 3: Multiple aicss attributes on nested elements -->
+        <div class="test-case">
+            <h2>Multiple AICSS on Nested Elements</h2>
+            <div aicss="background blue, padding large">
+                <p aicss="color white, font size large">
+                    <span aicss="font weight bold, text decoration underline">Deeply nested aicss attributes</span>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Test case 4: Conflicting styles from aicss and class -->
+        <div class="test-case">
+            <h2>Conflicting Styles</h2>
+            <div class="red-background" aicss="background blue, color white">
+                This element has conflicting styles from class and aicss
+            </div>
+            <style>
+                .red-background { background-color: red !important; }
+            </style>
+        </div>
+        
+        <!-- Test case 5: Extremely long aicss value -->
+        <div class="test-case">
+            <h2>Extremely Long AICSS Value</h2>
+            <div aicss="background blue, color white, padding large, margin small, border radius medium, font size large, line height 1.5, text transform uppercase, letter spacing 2px, font weight bold, text decoration underline, text align center, display flex, justify content center, align items center, flex direction column, gap medium, opacity 0.9, z index 10, position relative, overflow hidden, cursor pointer, transition all 0.3s ease, box shadow 0 2px 5px rgba(0,0,0,0.2), transform scale(1), width 100%, max width 500px, min height 100px">
+                This element has an extremely long aicss value with many properties
+            </div>
+        </div>
+        
+        <!-- Test case 6: Special characters in aicss -->
+        <div class="test-case">
+            <h2>Special Characters</h2>
+            <div aicss="color #00ff00, content 'Hello & Goodbye', font-family 'Arial, \"Helvetica\", sans-serif'">
+                This element has special characters in aicss
+            </div>
+        </div>
+        
+        <!-- Test case 7: Multiple identical selectors from aistyle -->
+        <div class="test-case">
+            <h2>Multiple Identical Selectors</h2>
+            <p class="duplicate-selector">This paragraph should have styles from multiple identical selectors</p>
+        </div>
+        
+        <!-- Test case 8: Empty AI element -->
+        <div class="test-case">
+            <h2>Empty AI Element</h2>
+            <aidiv></aidiv>
+        </div>
+        
+        <!-- Test case 9: AI element with malformed content -->
+        <div class="test-case">
+            <h2>Malformed AI Element</h2>
+            <aidiv>text with style "color red"</aidiv>
+        </div>
+        
+        <!-- Test case 10: Nested AI elements with incorrect nesting -->
+        <div class="test-case">
+            <h2>Incorrectly Nested AI Elements</h2>
+            <aidiv>content "<aidiv>nested content</aidiv>" with style "padding large"</aidiv>
+        </div>
+        
+        <!-- Test case 11: Self-closing AI elements -->
+        <div class="test-case">
+            <h2>Self-Closing AI Elements</h2>
+            <aiimg src="https://via.placeholder.com/150" alt="Test image" with style="border radius large"/>
+        </div>
+        
+        <!-- Test case 12: AI element with HTML content that has quotes -->
+        <div class="test-case">
+            <h2>AI Element with HTML Content Containing Quotes</h2>
+            <aidiv>content "<div class=\"quoted-class\" id='quoted-id'>Content with quotes</div>" with style "padding large"</aidiv>
+        </div>
+        
+        <!-- Test case 13: Attribute with unusual spacing -->
+        <div class="test-case">
+            <h2>Unusual Spacing in Attribute</h2>
+            <div      aicss =    "color     red,     background    blue"   >
+                This element has unusual spacing in its aicss attribute
+            </div>
+        </div>
+        
+        <!-- Test case 14: Broken aihtml tag content -->
+        <div class="test-case">
+            <h2>Broken AIHTML Content</h2>
+            <aihtml>
+                malformed content without proper structure
+            </aihtml>
+        </div>
+        
+        <!-- Test case 15: HTML injection attempts -->
+        <div class="test-case">
+            <h2>HTML Injection Attempts</h2>
+            <div aicss="<script>alert('test')</script>, background red">
+                This element attempts HTML injection in aicss
+            </div>
+            <aidiv>content "<script>alert('test')</script>" with style "padding large"</aidiv>
+        </div>
+        
+        <!-- Test case 16: CSS injection attempts -->
+        <div class="test-case">
+            <h2>CSS Injection Attempts</h2>
+            <div aicss="} body { background: red; color: white; {">
+                This element attempts CSS injection in aicss
+            </div>
+        </div>
+        
+        <!-- Test case 17: Unicode characters -->
+        <div class="test-case">
+            <h2>Unicode Characters</h2>
+            <div aicss="color red, content '안녕하세요 こんにちは 你好'">
+                This element has Unicode characters in aicss
+            </div>
+        </div>
+        
+        <!-- Test case 18: Case sensitivity -->
+        <div class="test-case">
+            <h2>Case Sensitivity</h2>
+            <div aicss="COLOR red, Background BLUE, FONT-SIZE large">
+                This element tests case sensitivity in aicss
+            </div>
+        </div>
+        
+        <!-- Test case 19: Overlapping AI tags -->
+        <div class="test-case">
+            <h2>Overlapping AI Tags</h2>
+            <div aicss="background light gray, padding medium">
+                <aibutton>text "Button outside" with style "color white, background blue"</aibutton>
+                <div aicss="padding small, background white">
+                    <aibutton>text "Button inside" with style "color white, background green"</aibutton>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test case 20: Attribute with no value -->
+        <div class="test-case">
+            <h2>Attribute with No Value</h2>
+            <aibutton with style="background red, color white">No text attribute</aibutton>
+        </div>
+    </div>
+</body>
+</html>

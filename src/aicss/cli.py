@@ -104,18 +104,22 @@ def generate(description, selector):
 
 @main.command()
 @click.argument('input_path', type=click.Path(exists=True))
-@click.argument('output_path', type=click.Path())
+@click.argument('output_path', type=click.Path(), required=False)
 @click.option('--verbose', '-v', is_flag=True, help='Show detailed output')
 @click.option('--disable-progress/--enable-progress', default=True, 
               help='Disable progress bars (default: disabled)')
 @click.option('--max-passes', default=3, help='Maximum number of processing passes for AI tags (default: 3)')
-def process(input_path, output_path, verbose, disable_progress, max_passes):
+@click.option('--force', '-f', is_flag=True, help='Force overwriting output file if it exists')
+def process(input_path, output_path, verbose, disable_progress, max_passes, force):
     """
     Process HTML/CSS files with AI styling.
     
     For HTML files: Extracts aicss attributes, processes <ai*> tags, and replaces with real CSS.
     For CSS files: Copies to the output path.
     For directories: Processes all HTML/CSS files recursively.
+    
+    If output_path is a directory, the input filename will be preserved in that directory.
+    If output_path is not provided, a default "output" directory will be used in the current directory.
     
     Features:
     - Supports <aistyle> tags in the head section
@@ -125,22 +129,70 @@ def process(input_path, output_path, verbose, disable_progress, max_passes):
     # Lazily import ML components only when needed
     from .ml.engine import initialize_engine
     from .ml.html_processor import extract_and_process
+    import pathlib
     
     # Make sure progress bars are disabled
     import os
     if disable_progress:
         os.environ["TQDM_DISABLE"] = "1"
-        
-    # Initialize the ML engine with no progress bars
+    
+    # Create a useful error function
+    def error_exit(message, show_trace=False):
+        if show_trace:
+            import traceback
+            click.echo(f"Error: {message}", err=True)
+            click.echo(traceback.format_exc(), err=True)
+        else:
+            click.echo(f"Error: {message}. Run with --verbose for details.", err=True)
+        sys.exit(1)
+    
+    # Handle output path intelligently
     try:
-        initialize_engine()
+        # Convert to Path objects for easier manipulation
+        input_path_obj = pathlib.Path(input_path).absolute()
         
-        current_input = input_path
-        temp_output = None
-        final_output = output_path
+        # If no output_path provided, use default 'output' directory
+        if not output_path:
+            output_dir = pathlib.Path('output').absolute()
+            # Create the output directory if it doesn't exist
+            output_dir.mkdir(exist_ok=True)
+            output_path_obj = output_dir / input_path_obj.name
+            # Create message for user about default
+            if verbose:
+                click.echo(f"No output path provided. Using default: {output_path_obj}")
+        else:
+            output_path_obj = pathlib.Path(output_path).absolute()
+            
+            # Check if output_path ends with a slash, indicating it's intended to be a directory
+            if output_path.endswith('/') or output_path.endswith('\\'):
+                # Ensure the directory exists
+                output_path_obj.mkdir(exist_ok=True)
+                output_path_obj = output_path_obj / input_path_obj.name
+                if verbose:
+                    click.echo(f"Output path ends with slash, treating as directory. Using filename: {output_path_obj}")
+            # If output_path is an existing directory, use input filename in that directory
+            elif output_path_obj.is_dir():
+                output_path_obj = output_path_obj / input_path_obj.name
+                if verbose:
+                    click.echo(f"Output path is a directory. Using filename: {output_path_obj}")
+        
+        # Safety check: Don't overwrite input file
+        if input_path_obj == output_path_obj:
+            error_exit("Output path would overwrite input file. Please specify a different output path or directory.")
+        
+        # Check if output file already exists and --force is not set
+        if output_path_obj.exists() and not force and output_path_obj.is_file():
+            error_exit(f"Output file {output_path_obj} already exists. Use --force to overwrite.")
+        
+        # Make output path string
+        final_output = str(output_path_obj)
+        
+        # Initialize the ML engine
+        if not initialize_engine():
+            error_exit("Failed to initialize ML engine. Try running 'python main.py direct-download' first.")
         
         # First pass to handle standard processing
-        success = extract_and_process(current_input, final_output)
+        success = extract_and_process(input_path, final_output)
         
         if verbose:
             click.echo(f"Completed initial processing pass")
@@ -178,17 +230,12 @@ def process(input_path, output_path, verbose, disable_progress, max_passes):
         
         if success:
             click.echo(f"Successfully processed {input_path}")
-            click.echo(f"Output saved to {output_path}")
+            click.echo(f"Output saved to {final_output}")
         else:
-            click.echo(f"Error processing {input_path}", err=True)
+            error_exit(f"Error processing {input_path}")
             
     except Exception as e:
-        if verbose:
-            import traceback
-            click.echo(f"Error: {str(e)}", err=True)
-            click.echo(traceback.format_exc(), err=True)
-        else:
-            click.echo(f"Error processing {input_path}. Run with --verbose for details.", err=True)
+        error_exit(str(e), verbose)
 
 
 @main.command()

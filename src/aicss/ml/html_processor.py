@@ -768,10 +768,27 @@ def extract_and_process(input_path: str, output_path: str) -> bool:
             logger.error(f"Input path does not exist: {input_path}")
             return False
         
+        # Convert to absolute paths
+        input_path_abs = os.path.abspath(input_path)
+        output_path_abs = os.path.abspath(output_path)
+        
+        # Safety check: Don't overwrite input file accidentally
+        if input_path_abs == output_path_abs and os.path.isfile(input_path_abs):
+            logger.error(f"Input and output paths are the same file: {input_path_abs}")
+            return False
+        
         # Handle directories
         if os.path.isdir(input_path):
+            # Ensure output_path is also treated as a directory
+            if not output_path.endswith('/') and not output_path.endswith('\\'):
+                # If it doesn't end with a slash, append one
+                output_path = os.path.join(output_path, '')
+            
             # Create output directory if it doesn't exist
             os.makedirs(output_path, exist_ok=True)
+            
+            # Log for debugging
+            logger.info(f"Processing directory: {input_path} -> {output_path}")
             
             # Process all HTML files
             return process_directory(input_path, output_path)
@@ -781,23 +798,21 @@ def extract_and_process(input_path: str, output_path: str) -> bool:
             # Determine file type
             _, ext = os.path.splitext(input_path)
             
+            # Create output directory if it doesn't exist
+            output_dir = os.path.dirname(output_path_abs)
+            os.makedirs(output_dir, exist_ok=True)
+            
             # Process HTML files
             if ext.lower() in ['.html', '.htm']:
-                # Create output directory if it doesn't exist
-                output_dir = os.path.dirname(os.path.abspath(output_path))
-                os.makedirs(output_dir, exist_ok=True)
-                
                 _, styles = process_html_file(input_path, output_path)
-                
-                # Consider success even if no styles were extracted
+                logger.info(f"Processed HTML file with {len(styles)} style sections")
                 return True
             
             # Process CSS files
             elif ext.lower() == '.css':
                 # For CSS files, just copy to output
-                output_dir = os.path.dirname(os.path.abspath(output_path))
-                os.makedirs(output_dir, exist_ok=True)
                 shutil.copy2(input_path, output_path)
+                logger.info(f"Copied CSS file {input_path} to {output_path}")
                 return True
             
             # Unsupported file type
@@ -805,6 +820,7 @@ def extract_and_process(input_path: str, output_path: str) -> bool:
                 logger.error(f"Unsupported file type: {ext}")
                 return False
         
+        logger.error(f"Path is neither a file nor a directory: {input_path}")
         return False
     
     except Exception as e:
@@ -825,9 +841,25 @@ def process_directory(directory_path: str, output_path: Optional[str] = None, ex
         True if successful, False otherwise
     """
     try:
+        # Convert to absolute paths
+        dir_path_abs = os.path.abspath(directory_path)
+        output_path_abs = os.path.abspath(output_path) if output_path else None
+        
+        # Safety check: Don't process if output path is a subdirectory of input path
+        # This would cause an infinite loop as we'd keep processing our own output
+        if output_path_abs and output_path_abs.startswith(dir_path_abs):
+            # Only warn if they're not the same directory (which is actually fine)
+            if output_path_abs != dir_path_abs:
+                logger.warning(f"Output path {output_path_abs} is a subdirectory of input {dir_path_abs}")
+                logger.warning("This could cause recursion. Consider using a separate output directory.")
+        
+        # Create output directory if it doesn't exist
+        if output_path_abs:
+            os.makedirs(output_path_abs, exist_ok=True)
+            logger.info(f"Created output directory: {output_path_abs}")
+        
         # Find all HTML files in the directory
         html_files = []
-        dir_path_abs = os.path.abspath(directory_path)
         
         for root, _, files in os.walk(directory_path):
             for file in files:
@@ -836,18 +868,27 @@ def process_directory(directory_path: str, output_path: Optional[str] = None, ex
                     file_path = os.path.join(root, file)
                     file_path_abs = os.path.abspath(file_path)
                     
-                    # Only process if not in output path
-                    if output_path and _is_subpath(file_path_abs, os.path.abspath(output_path)):
+                    # Only process if not in output path or if paths are the same (we're updating in place)
+                    if (output_path_abs and 
+                        _is_subpath(file_path_abs, output_path_abs) and
+                        not os.path.commonprefix([file_path_abs, dir_path_abs]) == dir_path_abs):
                         logger.info(f"Skipping file in output directory: {file_path}")
                         continue
                     
                     html_files.append(file_path)
+        
+        if not html_files:
+            logger.warning(f"No HTML files found in {directory_path}")
+            return True  # Not a failure, just nothing to do
+        
+        logger.info(f"Found {len(html_files)} HTML files to process")
         
         # Process each file
         results = {}
         
         with ThreadPoolExecutor() as executor:
             futures = []
+            out_files = []
             
             for file_path in html_files:
                 relative_path = os.path.relpath(file_path, directory_path)
@@ -855,27 +896,41 @@ def process_directory(directory_path: str, output_path: Optional[str] = None, ex
                 if output_path:
                     # Determine output file path
                     out_file = os.path.join(output_path, relative_path)
+                    # Create parent directories if needed
+                    os.makedirs(os.path.dirname(os.path.abspath(out_file)), exist_ok=True)
                 else:
                     out_file = None
                 
+                out_files.append(out_file)
                 futures.append(
                     executor.submit(process_html_file, file_path, out_file, extract_only)
                 )
             
             success = True
+            processed_files = 0
+            total_styles = 0
+            
             for i, future in enumerate(futures):
-                _, styles = future.result()
-                if not styles:
+                try:
+                    _, styles = future.result()
+                    if styles:
+                        results[html_files[i]] = styles
+                        processed_files += 1
+                        total_styles += len(styles)
+                    else:
+                        logger.warning(f"No styles found in {html_files[i]}")
+                except Exception as e:
+                    logger.error(f"Error processing {html_files[i]}: {e}")
                     success = False
-                results[html_files[i]] = styles
         
-        # Print summary (without progress bars)
-        total_files = len(results)
-        total_styles = sum(len(styles) for styles in results.values())
-        logger.info(f"Processed {total_files} HTML files - extracted {total_styles} style descriptions")
+        # Print summary
+        logger.info(f"Successfully processed {processed_files} of {len(html_files)} HTML files")
+        logger.info(f"Extracted {total_styles} style descriptions in total")
         
         return success
     
     except Exception as e:
         logger.error(f"Error processing directory {directory_path}: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False

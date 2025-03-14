@@ -142,6 +142,69 @@ def _generate_semantic_class_name(element_id: str, element_tag: str, description
     return class_name
 
 
+def preprocess_html_for_dangerous_entities(html_content: str) -> str:
+    """
+    Preprocesses the HTML content to remove dangerous entities before parsing.
+    
+    This aggressive preprocessing step is needed to avoid issues with HTML entities
+    persisting in the final output.
+    
+    Args:
+        html_content: The raw HTML content
+        
+    Returns:
+        Preprocessed HTML content with dangerous entities replaced
+    """
+    # First, preserve HTML comments by replacing them with placeholders
+    comment_placeholders = {}
+    
+    def replace_comment(match):
+        placeholder = f"__COMMENT_PLACEHOLDER_{len(comment_placeholders)}__"
+        # Clean HTML entities in comments before storing
+        comment_content = match.group(0)
+        # Ultra-aggressive cleaning for comments
+        cleaned_comment = re.sub(r'&lt;/?[a-z0-9]+[^&]*&gt;?', ' ', comment_content)
+        cleaned_comment = re.sub(r'<ai[^>]*>[^<]*</ai[^>]*>', ' ', cleaned_comment)
+        cleaned_comment = re.sub(r'<ai[^>]*/>', ' ', cleaned_comment)
+        comment_placeholders[placeholder] = cleaned_comment
+        return placeholder
+    
+    # Replace all HTML comments with placeholders
+    html_content = re.sub(r'<!--.*?-->', replace_comment, html_content, flags=re.DOTALL)
+    
+    # Handle HTML entities in attributes by completely removing problematic attributes
+    html_content = re.sub(r'\s+([a-z\-]+)="[^"]*&lt;/?[a-z0-9]+[^"]*"', r'', html_content)
+    html_content = re.sub(r'\s+([a-z\-]+)=\'[^\']*&lt;/?[a-z0-9]+[^\']*\'', r'', html_content)
+    
+    # Special cleanup for class attributes with HTML entities
+    html_content = re.sub(r'class="([^"]*&lt;/?[a-z0-9]+[^"]*)"', r'class=""', html_content)
+    html_content = re.sub(r"class='([^']*&lt;/?[a-z0-9]+[^']*)'", r"class=''", html_content)
+    
+    # Replace data-* attributes with HTML entities (these often cause problems)
+    html_content = re.sub(r'\s+data-[a-z\-]+="[^"]+"', r'', html_content)
+    
+    # For any remaining entities in text content, replace them
+    html_content = re.sub(r'&lt;/[a-z0-9]+\s*', ' ', html_content)
+    html_content = re.sub(r'&lt;[a-z0-9]+\s*', ' ', html_content)
+    
+    # More aggressive cleanup of HTML entities
+    html_content = re.sub(r'&lt;/?[a-z0-9]+[^&]*&gt;', ' ', html_content)
+    
+    # Clean up any escaped quotes in content strings
+    html_content = re.sub(r'\\([\'"])', r'\1', html_content)
+    
+    # Handle style and content directives in text content
+    html_content = re.sub(r'content\s+"([^"]*)"', r'\1', html_content)
+    html_content = re.sub(r"content\s+'([^']*)'", r'\1', html_content)
+    html_content = re.sub(r'with\s+style\s+"[^"]*"', r'', html_content)
+    html_content = re.sub(r"with\s+style\s+'[^']*'", r'', html_content)
+    
+    # Restore comments
+    for placeholder, comment in comment_placeholders.items():
+        html_content = html_content.replace(placeholder, comment)
+    
+    return html_content
+
 def process_html_file(file_path: str, output_path: Optional[str] = None, extract_only: bool = False) -> Tuple[str, Dict[str, str]]:
     """
     Process an HTML file to extract and optionally replace inline styles.
@@ -175,6 +238,9 @@ def process_html_file(file_path: str, output_path: Optional[str] = None, extract
         # Read the HTML file
         with open(file_path, 'r', encoding='utf-8') as f:
             html_content = f.read()
+        
+        # Aggressive preprocessing to clean up potential issues before parsing
+        html_content = preprocess_html_for_dangerous_entities(html_content)
         
         # Process <ai*> tags first - using the original HTML content to avoid missing tags
         processed_ai_html = process_ai_tags(html_content)
@@ -647,44 +713,58 @@ def extract_directives(text):
                 if directive in directives:
                     break
     
-    # Special case handling for content with nested quotes - try more advanced extraction if not found
+    # Advanced handle of content with nested quotes
     if "content" not in directives and ("content " in text or "content'" in text or "content\"" in text):
-        # Try more advanced extraction using balanced delimiter matching
-        content_start = None
-        quote_char = None
+        # Recognize different patterns of content delimiters
+        content_patterns = [
+            (r'content\s+"', '"'),  # Double quotes
+            (r'content\s+\'', '\''),  # Single quotes
+        ]
         
-        # Find where content starts and which quote character it uses
-        content_match = re.search(r'content\s+([\'"])', text)
-        if content_match:
-            content_start = content_match.start()
-            quote_char = content_match.group(1)
-            
-            if content_start is not None and quote_char is not None:
-                # Find the matching closing quote that's not escaped
-                in_escape = False
-                nesting_level = 0
-                start_pos = content_match.end()  # Position after the opening quote
+        for start_pattern, end_char in content_patterns:
+            content_match = re.search(start_pattern, text)
+            if not content_match:
+                continue
                 
-                for i in range(start_pos, len(text)):
-                    char = text[i]
-                    
-                    if char == '\\':
-                        in_escape = not in_escape
-                        continue
-                    
-                    if not in_escape and char == quote_char:
-                        # Found potential closing quote
-                        if i + 1 < len(text) and text[i+1:].lstrip().startswith('with style'):
-                            # This is likely the end of content if followed by style directive
-                            directives["content"] = text[start_pos:i]
-                            break
-                        elif i + 1 == len(text) or not text[i+1].isalnum():
-                            # This is likely the end if it's the end of string or followed by non-alphanum
-                            directives["content"] = text[start_pos:i]
-                            break
-                    
-                    in_escape = False
+            start_pos = content_match.end()  # Position after the opening quote
+            content_text = ""
+            found_end = False
+            nesting_level = 0  # For handling nested brackets and quotes
+            in_escape = False
             
+            # Iterate through the text to find matching end quote
+            for i in range(start_pos, len(text)):
+                char = text[i]
+                
+                # Handle escape sequences
+                if char == '\\':
+                    in_escape = not in_escape
+                    content_text += char
+                    continue
+                
+                # Handle potential closing quote
+                if not in_escape and char == end_char:
+                    # Check if this is likely the end of content
+                    # Common patterns that indicate end of content
+                    rest_of_text = text[i+1:].lstrip()
+                    if (rest_of_text.startswith('with style') or 
+                        rest_of_text.startswith('style') or
+                        rest_of_text == '' or  # End of string
+                        not rest_of_text[0].isalnum()):  # Followed by non-alphanum
+                        
+                        # We found a matching end quote
+                        found_end = True
+                        break
+                
+                # Add character to content
+                content_text += char
+                in_escape = False
+            
+            # If we found matching end quotes, use the content
+            if found_end:
+                directives["content"] = content_text
+                break
+    
     return directives
 
 def get_remaining_text(text, directives):
@@ -737,6 +817,71 @@ def get_remaining_text(text, directives):
     result = re.sub(r'</?[a-z][^>]*>', '', result)  # Remove stray HTML tags
     
     return result
+
+def clean_html_entities_in_attributes(soup):
+    """
+    Completely new approach to cleaning HTML entities in attributes.
+    
+    This function aggressively removes or cleans attributes with HTML entities.
+    """
+    # First, find all elements with attributes
+    for element in soup.find_all(lambda tag: tag.attrs):
+        # Check each attribute
+        attrs_to_remove = []
+        attrs_to_update = {}
+        
+        for attr_name, attr_value in element.attrs.items():
+            if isinstance(attr_value, str):
+                # Check if attribute value contains HTML entities
+                if '&lt;' in attr_value or '&gt;' in attr_value:
+                    # Completely remove href attributes with HTML entities
+                    if attr_name in ['href', 'src', 'data-', 'alt', 'title', 'id', 'controls']:
+                        attrs_to_remove.append(attr_name)
+                    # For class attributes, remove HTML entities but keep the rest
+                    elif attr_name == 'class':
+                        # Even more aggressive cleaning for class attributes
+                        cleaned_value = re.sub(r'&lt;/?[a-z0-9]+[^&]*&gt;?', '', attr_value)
+                        cleaned_value = re.sub(r'[<>]', '', cleaned_value)  # Also remove raw < and >
+                        # Remove any quotes that might be part of the class name
+                        cleaned_value = re.sub(r'[\'"]', '', cleaned_value)
+                        
+                        if cleaned_value.strip():
+                            attrs_to_update[attr_name] = cleaned_value
+                        else:
+                            attrs_to_remove.append(attr_name)
+                    # Other attributes, just remove
+                    else:
+                        attrs_to_remove.append(attr_name)
+            elif isinstance(attr_value, list):
+                # Handle list attributes like classes
+                cleaned_values = []
+                has_entities = False
+                
+                for value in attr_value:
+                    if isinstance(value, str) and ('&lt;' in value or '&gt;' in value or '<' in value or '>' in value):
+                        has_entities = True
+                        # More aggressive cleaning for class attributes
+                        cleaned = re.sub(r'&lt;/?[a-z0-9]+[^&]*&gt;?', '', value)
+                        cleaned = re.sub(r'[<>]', '', cleaned)  # Also remove raw < and >
+                        cleaned = re.sub(r'[\'"]', '', cleaned)  # Remove quotes
+                        
+                        if cleaned.strip():
+                            cleaned_values.append(cleaned)
+                    else:
+                        cleaned_values.append(value)
+                
+                if has_entities:
+                    if cleaned_values:
+                        attrs_to_update[attr_name] = cleaned_values
+                    else:
+                        attrs_to_remove.append(attr_name)
+        
+        # Apply the changes
+        for attr_name in attrs_to_remove:
+            del element[attr_name]
+            
+        for attr_name, attr_value in attrs_to_update.items():
+            element[attr_name] = attr_value
 
 def process_ai_tags(html_content: str) -> str:
     """
@@ -1025,22 +1170,118 @@ def process_ai_tags(html_content: str) -> str:
                     new_text = re.sub(r'content "([^"]*)"', r'\1', element)
                     element.replace_with(new_text)
         
+        # 4b. Fix 'content' in single quotes
+        for element in final_soup.find_all(string=lambda text: text and text.strip().startswith("content '")):
+            parent = element.parent
+            if parent:
+                content_match = re.search(r"content '([^']*)'", element)
+                if content_match:
+                    content_text = content_match.group(1)
+                    new_text = re.sub(r"content '([^']*)'", r'\1', element)
+                    element.replace_with(new_text)
+        
         # 5. Fix empty elements - add placeholder content
-        for tag_name in ['div', 'a', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'button']:
+        # This special check helps us find really empty elements to fix
+        empty_elements = []
+        for tag_name in ['div', 'a', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'button', 'li', 'td', 'th', 'textarea']:
+            # Find all elements of this tag type
             for element in final_soup.find_all(tag_name):
-                # Check if element is empty (no text and no child elements with content)
-                if not element.get_text(strip=True) and not [x for x in element.find_all() if x.get_text(strip=True)]:
-                    # Skip empty elements with aicss attribute - these might be intentional styling containers
-                    if not element.has_attr('aicss') or (element.has_attr('aicss') and len(element.get('aicss', '')) == 0):
-                        # Add appropriate placeholder content based on element type
-                        if tag_name == 'a':
-                            element.string = "Link"
-                        elif tag_name == 'button':
-                            element.string = "Button"
-                        elif tag_name.startswith('h'):
-                            element.string = f"Heading {tag_name[1]}"
-                        else:
-                            element.string = "Content placeholder"
+                # Super aggressive empty check - if there's nothing at all, or just whitespace text nodes
+                is_empty = False
+                
+                # Check if element has no text content
+                if not element.get_text(strip=True):
+                    # Check for children that actually have content
+                    child_elements = list(element.children)
+                    has_content = False
+                    
+                    for child in child_elements:
+                        # Check if it's a tag with actual content
+                        if hasattr(child, 'name') and child.name and child.get_text(strip=True):
+                            has_content = True
+                            break
+                        # Check if it's non-whitespace text
+                        elif isinstance(child, str) and child.strip():
+                            has_content = True
+                            break
+                    
+                    if not has_content:
+                        is_empty = True
+                
+                if is_empty:
+                    empty_elements.append(element)
+        
+        # Now fix all the empty elements we found
+        for element in empty_elements:
+            tag_name = element.name
+            # Clear any existing content
+            element.clear()
+            
+            # Add appropriate placeholder content based on element type
+            if tag_name == 'a':
+                element.string = "Link"
+            elif tag_name == 'button':
+                element.string = "Button"
+            elif tag_name.startswith('h'):
+                element.string = f"Heading {tag_name[1]}"
+            elif tag_name == 'textarea':
+                element.string = "Enter your message here"
+            else:
+                element.string = "Content placeholder"
+        
+        # Fix all text nodes with HTML entities - even more aggressive cleanup
+        for element in final_soup.find_all(string=lambda text: text and ('&lt;/' in text or '&lt;' in text or '&gt;' in text)):
+            parent = element.parent
+            if parent:
+                # Ultra-aggressive cleanup of HTML entities in text
+                new_text = re.sub(r'&lt;/?[a-z0-9]+[^&]*&gt;?', ' ', element.string)
+                new_text = re.sub(r'&[a-z]+;', ' ', new_text)  # Remove all HTML entities
+                
+                # Also clean up "content" directives with various quote patterns
+                new_text = re.sub(r'content\s+\'([^\']*)\'\s*', r'\1', new_text)
+                new_text = re.sub(r'content\s+"([^"]*)"', r'\1', new_text)
+                new_text = re.sub(r'content\s+', '', new_text)
+                
+                # Clean up style directives with various quote patterns
+                new_text = re.sub(r'\s+with\s+style\s+\'[^\']*\'', '', new_text)
+                new_text = re.sub(r'\s+with\s+style\s+"[^"]*"', '', new_text)
+                new_text = re.sub(r'\s+style\s+\'[^\']*\'', '', new_text)
+                new_text = re.sub(r'\s+style\s+"[^"]*"', '', new_text)
+                
+                # Clean up any remaining quotes or special characters
+                new_text = re.sub(r'^\s*[\'"]', '', new_text)  # Quotes at start
+                new_text = re.sub(r'[\'"]$', '', new_text)     # Quotes at end$', '', new_text)     # Quotes at end
+                
+                # Remove any escaped quotes
+                new_text = new_text.replace('\\"', '"').replace('\\\'', '\'')
+                
+                element.replace_with(new_text)
+        
+        # Use the new HTML entity attribute cleaner
+        clean_html_entities_in_attributes(final_soup)
+        
+        # Find and fix any text nodes that have content directives
+        for element in final_soup.find_all(string=lambda text: text and ('content ' in text)):
+            parent = element.parent
+            if parent:
+                # More aggressive cleanup of content directives
+                new_text = re.sub(r'content\s+\'([^\']*)\'\s*', r'\1', element.string)
+                new_text = re.sub(r'content\s+"([^"]*)"', r'\1', new_text)
+                new_text = re.sub(r'content\s+', '', new_text)
+                # Clean up style directives as well
+                new_text = re.sub(r'\s+with\s+style\s+\'[^\']*\'', '', new_text)
+                new_text = re.sub(r'\s+with\s+style\s+"[^"]*"', '', new_text)
+                element.replace_with(new_text)
+                
+        # Find and fix nested quotes
+        for element in final_soup.find_all(string=lambda text: text and ('"' in text or "'" in text)):
+            parent = element.parent
+            if parent:
+                # Replace quoted sections with their content
+                new_text = re.sub(r'"\s*([^"]*)\s*"', r'\1', element.string)
+                new_text = re.sub(r"'\s*([^']*)\s*'", r'\1', new_text)
+                if new_text != element.string:
+                    element.replace_with(new_text)
         
         # Use the cleaned soup as the final HTML
         processed_html = str(final_soup)
@@ -1051,9 +1292,31 @@ def process_ai_tags(html_content: str) -> str:
         
         # Multiple passes of regex cleanup
         for _ in range(3):  # Apply multiple passes to catch nested issues
-            # Fix HTML entities in class names
-            processed_html = re.sub(r'<([a-z]+) class="&lt;/div">', r'<\1>', processed_html)
-            processed_html = re.sub(r'<([a-z]+) class="&lt;/[a-z]+">', r'<\1>', processed_html)
+            # Fix HTML entities in attributes - more aggressive patterns
+            
+            # Complete removal approach - remove any attribute with HTML entities
+            processed_html = re.sub(r'\s+([a-z\-]+)="[^"]*&lt;/?[a-z0-9]+[^"]*"', r'', processed_html)
+            processed_html = re.sub(r'\s+([a-z\-]+)=\'[^\']*&lt;/?[a-z0-9]+[^\']*\'', r'', processed_html)
+            
+            # Remove any remaining &lt; entities in content - very aggressive
+            processed_html = re.sub(r'&lt;/?[a-z0-9]+[^&]*&gt;?', '', processed_html)
+            
+            # Also clean up content directive text
+            processed_html = re.sub(r'content\s+"([^"]*)"', r'\1', processed_html)
+            processed_html = re.sub(r"content\s+'([^']*)'", r'\1', processed_html)
+            processed_html = re.sub(r'>\s*content\s+"([^"]*)"', r'>\1', processed_html)
+            processed_html = re.sub(r">\s*content\s+'([^']*)'", r'>\1', processed_html)
+            processed_html = re.sub(r'>\s*content\s+', '>', processed_html)
+            
+            # Clean up style directives
+            processed_html = re.sub(r'\s+with\s+style\s+"[^"]*"', '', processed_html)
+            processed_html = re.sub(r"\s+with\s+style\s+'[^']*'", '', processed_html)
+            
+            # Remove extra quotes in content
+            processed_html = re.sub(r'>\s*"([^"<>]*)"', r'>\1', processed_html)
+            processed_html = re.sub(r">\s*'([^'<>]*)'", r'>\1', processed_html)
+            processed_html = re.sub(r'"\s+with\s+style\s+"[^"]*"', '', processed_html)
+            processed_html = re.sub(r"'\s+with\s+style\s+'[^']*'", '', processed_html)
             
             # Fix content with trailing style directives
             processed_html = re.sub(r'"\s+with style "([^"]+)"</div>', r'</div>', processed_html)
@@ -1062,6 +1325,8 @@ def process_ai_tags(html_content: str) -> str:
             # Fix duplicate quotes from complex nested content
             processed_html = re.sub(r'content "([^"]*)" with style', r'content \1 with style', processed_html)
             processed_html = re.sub(r"content '([^']*)' with style", r'content \1 with style', processed_html)
+            processed_html = re.sub(r'>\s*content\s+"([^"]+)"\s*<', r'>\1<', processed_html)
+            processed_html = re.sub(r">\s*content\s+'([^']+)'\s*<", r'>\1<', processed_html)
             
             # Fix stray closing div tags
             processed_html = re.sub(r'</div>\s*"\s+with style', r'" with style', processed_html)
@@ -1069,6 +1334,36 @@ def process_ai_tags(html_content: str) -> str:
             # Fix any other common malformed patterns
             processed_html = re.sub(r'<div>\s*content\s+"([^"]+)"\s+with style\s+"([^"]+)"', r'<div aicss="\2">\1', processed_html)
             processed_html = re.sub(r'<div>\s*content\s+\'([^\']+)\'\s+with style\s+\'([^\']+)\'', r'<div aicss="\2">\1', processed_html)
+            
+            # Fix floating quotes and content directives - much more aggressive patterns
+            processed_html = re.sub(r'>\s*content\s+"([^"]+)"\s*<', r'>\1<', processed_html)
+            processed_html = re.sub(r">\s*content\s+'([^']+)'\s*<", r'>\1<', processed_html)
+            processed_html = re.sub(r'>\s*content\s+\'([^\']*)\'\s+', r'>', processed_html)
+            processed_html = re.sub(r'>\s*content\s+"([^"]*)"\s+', r'>', processed_html)
+            processed_html = re.sub(r'>\s*content\s+Level\s+', '> Level ', processed_html)
+            processed_html = re.sub(r'\s+with\s+style\s+"([^"]+)"\s*(?=</)', ' ', processed_html)
+            processed_html = re.sub(r'\s+with\s+style\s+\'([^\']+)\'\s*(?=</)', ' ', processed_html)
+            
+            # Fix any leftover floating quotes in content
+            processed_html = re.sub(r'>\s*"\s*([^"<>]*?)"\s*<', r'>\1<', processed_html)
+            processed_html = re.sub(r">\s*'\s*([^'<>]*?)'\s*<", r'>\1<', processed_html)
+            
+            # Fix empty elements - be even more aggressive
+            for tag in ['div', 'span', 'p', 'button', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'td', 'th']:
+                # First pass for completely empty tags
+                processed_html = re.sub(f'<{tag}([^>]*)>\s*</{tag}>', f'<{tag}\\1>Content placeholder</{tag}>', processed_html)
+                # Second pass for tags with just non-breaking spaces
+                processed_html = re.sub(f'<{tag}([^>]*)>\s*(?:&nbsp;|&#160;)\s*</{tag}>', f'<{tag}\\1>Content placeholder</{tag}>', processed_html)
+                # Third pass for tags with just invisible markup
+                processed_html = re.sub(f'<{tag}([^>]*)>\s*(?:<br>|<br/>|<br />)\s*</{tag}>', f'<{tag}\\1>Content placeholder</{tag}>', processed_html)
+                # Fourth pass for tags with just whitespace
+                processed_html = re.sub(f'<{tag}([^>]*)>(\s*)</{tag}>', f'<{tag}\\1>Content placeholder</{tag}>', processed_html)
+            
+            # Special handling for textarea - these have different placeholder text
+            processed_html = re.sub(r'<textarea([^>]*)>\s*</textarea>', r'<textarea\1>Enter your message here</textarea>', processed_html)
+            processed_html = re.sub(r'<textarea([^>]*)>\s*(?:&nbsp;|&#160;)\s*</textarea>', r'<textarea\1>Enter your message here</textarea>', processed_html)
+            processed_html = re.sub(r'<textarea([^>]*)>\s*(?:<br>|<br/>|<br />)\s*</textarea>', r'<textarea\1>Enter your message here</textarea>', processed_html)
+            processed_html = re.sub(r'<textarea([^>]*)>(\s*)</textarea>', r'<textarea\1>Enter your message here</textarea>', processed_html)
     
     return processed_html
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isolated HTML Entity Bug Test</title>
+</head>
+<body>
+    <h1>Isolated HTML Entity Bug Test</h1>
+    <p>This file isolates specific issues with the AI CSS processor related to malformed HTML entities.</p>
+
+    <!-- Test 1: Malformed HTML entities in content -->
+    <div class="test-section">
+        <h2>Malformed HTML Entities in Element Content</h2>
+        <aidiv>content "
+            <div>
+                <h3>Level 1 AI Element</h3>
+                <p>This has a closing div tag that gets converted to an entity: &lt;/div</p>
+            </div>
+        " with style "padding large, background light gray, rounded corners"</aidiv>
+    </div>
+
+    <!-- Test 2: HTML entities in class attributes -->
+    <div class="test-section">
+        <h2>HTML Entities in Attributes</h2>
+        <div class="&lt;/div">
+            <p>This div has a class attribute with a closing div entity</p>
+        </div>
+    </div>
+
+    <!-- Test 3: Nested quotes in content -->
+    <div class="test-section">
+        <h2>Nested Quotes in Content</h2>
+        <aidiv>content "
+            <div>
+                <h3>Nested Quotes Example</h3>
+                <p>This has 'single quotes' and \"double quotes\" in content</p>
+                <aibutton>text 'Button with \"quotes\" inside' with style 'background blue, color white, padding small'</aibutton>
+            </div>
+        " with style "padding large, background light gray, rounded corners"</aidiv>
+    </div>
+
+    <!-- Test 4: Multiple levels of nesting with complex quoting -->
+    <div class="test-section">
+        <h2>Complex Nesting with Quotes</h2>
+        <aidiv>content "
+            <div>
+                <h3>Level 1 AI Element</h3>
+                <aidiv>content '
+                    <div>
+                        <h4>Level 2 AI Element</h4>
+                        <aidiv>content \"
+                            <div>
+                                <h5>Level 3 AI Element</h5>
+                                <p>This is the deepest level</p>
+                            </div>
+                        \" with style \"background purple, color white, padding small, rounded corners\"</aidiv>
+                    </div>
+                ' with style 'background blue, color white, padding medium, rounded corners'</aidiv>
+            </div>
+        " with style "padding large, background light gray, rounded corners"</aidiv>
+    </div>
+
+    <!-- Test 5: Floating content and style directives -->
+    <div class="test-section">
+        <h2>Floating Directives</h2>
+        <div>
+            content "This should be just text without the content directive"
+        </div>
+        <p>
+            with style "This should be just text without the style directive"
+        </p>
+    </div>
+
+    <!-- Test 6: Self-closing AI tags -->
+    <div class="test-section">
+        <h2>Self-closing AI Tags</h2>
+        <aidiv>content "
+            <div>
+                <h3>Container with Self-closing Tags</h3>
+                <aiimg src='https://via.placeholder.com/300x200' alt='Placeholder' with style='max width 100%, border radius medium, shadow'/>
+                <p>Text after self-closing tag</p>
+            </div>
+        " with style "padding large, background light gray, rounded corners"</aidiv>
+    </div>
+
+    <!-- Test 7: AI tags in comments -->
+    <div class="test-section">
+        <h2>AI Tags in Comments</h2>
+        <div aicss="padding large, background light gray, rounded corners">
+            <h3>Container with AI Tags in Comments</h3>
+            <!-- <aibutton>text 'Button in comment' with style 'background blue, color white'</aibutton> -->
+            <p>The AI button in the comment above should not be processed</p>
+        </div>
+    </div>
+</body>
+</html>

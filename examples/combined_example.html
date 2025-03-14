@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combined Example - AI CSS Framework</title>
+    
+    <!-- Example of inline CSS -->
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* These classes should be preserved */
+        .preserved-class {
+            background-color: #f0f8ff;
+            padding: 20px;
+            border: 1px solid #b0c4de;
+        }
+        
+        /* These will be enhanced with AI-generated classes */
+        .hero-section {
+            /* Basic styles that will be supplemented */
+            padding: 20px;
+        }
+    </style>
+    <aistyle>
+        body class: font family Segoe UI, line height is 1.8. Color is #444. Lots of padding.
+    </aistyle>
+</head>
+<body>
+    <!-- Regular header with aicss attribute -->
+    <header aicss="dark blue background, white text, centered, large padding">
+        <h1>AI CSS Framework Demo</h1>
+        <p>Combining multiple approaches in one example</p>
+    </header>
+    
+    <!-- Main container using a class that should match one from styles.css -->
+    <main class="container">
+        <!-- Regular element with a class matching natural language -->
+        <div class="centered margin-top">
+            <h2 class="text-primary bold">Welcome to the Demo</h2>
+            <p>This example demonstrates various ways to use the AI CSS Framework.</p>
+        </div>
+        
+        <!-- Section using aihtml tag -->
+        <section class="features-section margin-top">
+            <h2 aicss="text center, primary color, bold, margin bottom">Key Features</h2>
+            
+            <aihtml>
+                a contact form with aicss="white background, light gray border, rounded corners, shadow, padding large".
+                submit button with aicss="primary color background, white text, bold, rounded"
+            </aihtml>
+        </section>
+        
+        <!-- Section using various ai* elements -->
+        <section class="demo-section margin-top padding">
+            <h2 aicss="text center, primary color, bold, margin bottom">AI Elements Demo</h2>
+            
+            <div aicss="flex, space between, margin bottom">
+                <!-- AI button elements -->
+                <aibutton>text "Primary Button" with style "primary color background, white text, bold, rounded"</aibutton>
+                <aibutton>text "Secondary Button" with style "secondary color background, white text, rounded"</aibutton>
+                <aibutton>text "Success Button" with style "success color background, white text, rounded"</aibutton>
+            </div>
+            
+            <div aicss="flex column, gap medium">
+                <!-- AI input elements -->
+                <aiinput>type "text" placeholder "Your Name" with style "full width, padding medium, rounded, light border"</aiinput>
+                <aiinput>type "email" placeholder "Your Email" with style "full width, padding medium, rounded, light border"</aiinput>
+                
+                <!-- AI element with a class name specified in the description -->
+                <aitextarea>placeholder "Your Message" with style "full width, padding medium, rounded, light border, class form-input"</aitextarea>
+            </div>
+        </section>
+        
+        <!-- Cards section with regular HTML and aicss -->
+        <section class="cards-section margin-top">
+            <h2 aicss="text center, primary color, bold, margin bottom">Card Examples</h2>
+            
+            <div aicss="flex, space between, gap medium">
+                <!-- Card using the card class from styles.css -->
+                <div class="card">
+                    <div class="card-header">Standard Card</div>
+                    <div class="card-body">
+                        <p>This card uses classes from styles.css</p>
+                        <button class="btn-primary">Learn More</button>
+                    </div>
+                </div>
+                
+                <!-- Card using aicss attribute -->
+                <div aicss="white background, light gray border, rounded corners, shadow, padding medium, class card-custom">
+                    <h3 aicss="primary color, margin bottom small">Custom Card</h3>
+                    <p>This card uses aicss attribute styling.</p>
+                    <button aicss="primary color background, white text, rounded, bold, class btn-custom">View Details</button>
+                </div>
+                
+                <!-- Card using ai element -->
+                <aidiv>content "<h3>AI Generated Card</h3><p>This entire card is AI-generated.</p>" with style "white background, border primary color, rounded corners, shadow, padding medium"</aidiv>
+            </div>
+        </section>
+        
+        <!-- Text styling examples -->
+        <section class="text-section margin-top padding">
+            <h2 aicss="text center, primary color, bold, margin bottom">Text Styling</h2>
+            
+            <p aicss="dark gray color, line height 1.6, margin bottom, class text-example">
+                This paragraph uses aicss attribute styling with a specific class name.
+            </p>
+            
+            <aip>text "This paragraph is AI-generated with styling." with style "font size large, primary color, italic, margin bottom, class ai-paragraph"</aip>
+            
+            <div class="preserved-class">
+                <h3>Preserved Styling</h3>
+                <p>This div uses a class with styling defined in the inline style tag.</p>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer with aicss -->
+    <footer aicss="dark background, white text, text center, padding medium, margin top">
+        <p>AI CSS Framework - Combining multiple styling approaches</p>
+        <p>© 2025 Example Company</p>
+    </footer>
+</body>
+</html>

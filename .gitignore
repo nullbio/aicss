@@ -1,0 +1,44 @@
+# Virtual environment
+venv/
+.env/
+env/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Local development settings
+.DS_Store
+.idea/
+.vscode/
+
+# Test coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache/
+coverage.xml
+*.cover
+
+# Log files
+*.log
+logs/
+
+# IDE settings
+.project
+.spyderproject
+.ropeproject
+*.swp
+*.swo
+
+# ML related
+.cache/
+.model_cache/
+**/output/

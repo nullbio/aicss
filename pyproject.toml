@@ -1,0 +1,36 @@
+[build-system]
+requires      = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aicss"
+version = "0.1.0"
+authors = [
+    { name = "AI CSS Framework Team" },
+]
+description = "A CSS framework optimized for AI generation and interpretation"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "click",
+    "jinja2",
+    "cssutils",
+    "pytest",
+    "transformers>=4.31.0",
+    "torch>=2.0.0",
+    "onnxruntime",
+    "huggingface_hub",
+    "beautifulsoup4",
+    "lxml",
+    "fasttext",
+    "accelerate",
+    "sentence-transformers",
+    "minify_html",
+    "watchdog",
+]
+
+[project.scripts]
+aicss = "aicss.cli:main"
+
+[tool.pytest]
+testpaths = ["tests"]

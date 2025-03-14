@@ -400,13 +400,20 @@ def generate_html_from_tag(tag_name: str, description: str) -> str:
         "a": """<a href="{href}">{text}</a>""",
     }
     
-    # Extract styling if present
-    aicss_match = re.search(r'with\s+style\s+"([^"]+)"', description) or re.search(r'aicss="([^"]+)"', description)
-    aicss_attr = f' aicss="{aicss_match.group(1)}"' if aicss_match else ""
+    # Extract directives using our helper function
+    directives = extract_directives(description)
+    
+    # Determine attributes
+    aicss_attr = f' aicss="{directives["style"]}"' if "style" in directives else ""
     
     # Extract class if present
-    class_match = re.search(r'class\s+([a-zA-Z0-9_-]+)', description) or re.search(r'class\s+"([^"]+)"', description)
-    class_attr = f' class="{class_match.group(1)}"' if class_match else ""
+    class_attr = ""
+    if "class" in directives:
+        class_name = directives["class"]
+        # Remove quotes if they're present
+        if class_name.startswith('"') and class_name.endswith('"'):
+            class_name = class_name[1:-1]
+        class_attr = f' class="{class_name}"'
     
     # Combine attributes
     attributes = aicss_attr + class_attr
@@ -417,66 +424,62 @@ def generate_html_from_tag(tag_name: str, description: str) -> str:
         
         # Handle button
         if base_tag == "button":
-            text_match = re.search(r'text\s+"([^"]+)"', description) or re.search(r'saying\s+"([^"]+)"', description)
-            text = text_match.group(1) if text_match else "Button"
+            text = directives.get("text", "Button")
             return f"""<button type="button"{attributes}>{text}</button>"""
         
         # Handle input
         elif base_tag == "input":
-            input_type_match = re.search(r'type\s+"([^"]+)"', description)
-            input_type = input_type_match.group(1) if input_type_match else "text"
-            
-            placeholder_match = re.search(r'placeholder\s+"([^"]+)"', description)
-            placeholder = placeholder_match.group(1) if placeholder_match else ""
-            
+            input_type = directives.get("type", "text")
+            placeholder = directives.get("placeholder", "")
             return f"""<input type="{input_type}" placeholder="{placeholder}"{attributes}>"""
             
         # Handle textarea
         elif base_tag == "textarea":
-            placeholder_match = re.search(r'placeholder\s+"([^"]+)"', description)
-            placeholder = placeholder_match.group(1) if placeholder_match else ""
-            
-            content_match = re.search(r'content\s+"([^"]+)"', description)
-            content = content_match.group(1) if content_match else ""
-            
+            placeholder = directives.get("placeholder", "")
+            content = directives.get("content", "")
             return f"""<textarea placeholder="{placeholder}"{attributes}>{content}</textarea>"""
         
         # Handle links
         elif base_tag == "a":
-            href_match = re.search(r'href\s+"([^"]+)"', description) or re.search(r'to\s+"([^"]+)"', description)
-            href = href_match.group(1) if href_match else "#"
-            
-            text_match = re.search(r'text\s+"([^"]+)"', description) or re.search(r'saying\s+"([^"]+)"', description)
-            text = text_match.group(1) if text_match else "Link"
-            
+            href = directives.get("href", "#")
+            text = directives.get("text", "Link")
             return f"""<a href="{href}"{attributes}>{text}</a>"""
         
         # Handle image
         elif base_tag == "img":
-            src_match = re.search(r'src\s+"([^"]+)"', description) or re.search(r'source\s+"([^"]+)"', description)
-            src = src_match.group(1) if src_match else "https://via.placeholder.com/300x200"
-            
-            alt_match = re.search(r'alt\s+"([^"]+)"', description) or re.search(r'description\s+"([^"]+)"', description)
-            alt = alt_match.group(1) if alt_match else ""
-            
+            src = directives.get("src", "https://via.placeholder.com/300x200")
+            alt = directives.get("alt", "")
             return f"""<img src="{src}" alt="{alt}"{attributes}>"""
         
         # Handle text elements
         elif base_tag in ["p", "h1", "h2", "h3"]:
-            text_match = re.search(r'text\s+"([^"]+)"', description) or re.search(r'saying\s+"([^"]+)"', description)
-            text = text_match.group(1) if text_match else f"{base_tag.upper()} Text"
-            
+            text = directives.get("text", f"{base_tag.upper()} Text")
             return f"""<{base_tag}{attributes}>{text}</{base_tag}>"""
         
         # Handle div
         elif base_tag == "div":
-            content_match = re.search(r'content\s+"([^"]+)"', description)
-            content = content_match.group(1) if content_match else ""
-            
+            if "content" in directives:
+                content = directives["content"]
+            else:
+                # Use remaining text after removing known directives
+                content = get_remaining_text(description, directives)
+                # If nothing meaningful remains, provide a generic fallback
+                if not content or content.isspace():
+                    content = "AI-generated content"
+                    
             return f"""<div{attributes}>{content}</div>"""
     
-    # For unknown tags, generate a generic div with the description
-    return f"""<div{attributes}>{description}</div>"""
+    # For unknown tags, generate a generic div with remaining content after removing directives
+    if "content" in directives:
+        content = directives["content"]
+    else:
+        # Use remaining text after removing known directives
+        content = get_remaining_text(description, directives)
+        # If nothing meaningful remains, provide a generic fallback
+        if not content or content.isspace():
+            content = "AI-generated content"
+            
+    return f"""<div{attributes}>{content}</div>"""
 
 
 def generate_html_from_description(description: str) -> str:
@@ -567,13 +570,173 @@ def generate_html_from_description(description: str) -> str:
         
         return html
     
-    # Default: generate a simple section with the description
-    html = '<div class="ai-generated">\n'
-    html += f'  <p>Generated content from description: "{description}"</p>\n'
+    # Extract directives from the description
+    directives = extract_directives(description)
+    
+    # Default: generate a simple section with the description, but handle style and content better
+    if "style" in directives:
+        style_attr = f' aicss="{directives["style"]}"'
+    else:
+        style_attr = ''
+    
+    if "content" in directives:
+        content = directives["content"]
+    else:
+        # Use remaining text after removing known directives
+        content = get_remaining_text(description, directives)
+        # If nothing meaningful remains, provide a generic fallback
+        if not content or content.isspace():
+            content = "AI-generated content"
+    
+    html = f'<div class="ai-generated"{style_attr}>\n'
+    html += f'  {content}\n'
     html += '</div>'
     
     return html
 
+
+def extract_directives(text):
+    """
+    Extract directives (content, style, etc.) from text.
+    
+    Args:
+        text: The text to parse for directives
+        
+    Returns:
+        Dictionary of directives (e.g., {"content": "...", "style": "..."})
+    """
+    directives = {}
+    
+    # More robust patterns with explicit support for single and double quotes
+    patterns = {
+        # Support both single and double quotes for content
+        "content": [
+            r'content\s+"((?:[^"\\]|\\.)*)"|content\s+\'((?:[^\'\\]|\\.)*)\''
+        ],
+        # Support both single and double quotes for style with optional 'with'
+        "style": [
+            r'(?:with\s+)?style\s+"([^"]+)"|(?:with\s+)?style\s+\'([^\']+)\''
+        ],
+        # Support both quote styles for text
+        "text": [
+            r'text\s+"([^"]+)"|text\s+\'([^\']+)\''
+        ],
+        # Support class with and without quotes
+        "class": [
+            r'class\s+([a-zA-Z0-9_-]+)|class\s+"([^"]+)"|class\s+\'([^\']+)\''
+        ],
+        # Other attributes with quote flexibility
+        "href": [r'href\s+"([^"]+)"|href\s+\'([^\']+)\''],
+        "src": [r'src\s+"([^"]+)"|src\s+\'([^\']+)\''],
+        "alt": [r'alt\s+"([^"]+)"|alt\s+\'([^\']+)\''],
+        "type": [r'type\s+"([^"]+)"|type\s+\'([^\']+)\''],
+        "placeholder": [r'placeholder\s+"([^"]+)"|placeholder\s+\'([^\']+)\''],
+    }
+    
+    # Extract each directive type
+    for directive, pattern_list in patterns.items():
+        for pattern in pattern_list:
+            match = re.search(pattern, text)
+            if match:
+                # Find the first non-None group (accounting for multiple capture groups)
+                for group_idx in range(1, len(match.groups()) + 1):
+                    if match.group(group_idx) is not None:
+                        directives[directive] = match.group(group_idx)
+                        break
+                # If we found a match, no need to try other patterns for this directive
+                if directive in directives:
+                    break
+    
+    # Special case handling for content with nested quotes - try more advanced extraction if not found
+    if "content" not in directives and ("content " in text or "content'" in text or "content\"" in text):
+        # Try more advanced extraction using balanced delimiter matching
+        content_start = None
+        quote_char = None
+        
+        # Find where content starts and which quote character it uses
+        content_match = re.search(r'content\s+([\'"])', text)
+        if content_match:
+            content_start = content_match.start()
+            quote_char = content_match.group(1)
+            
+            if content_start is not None and quote_char is not None:
+                # Find the matching closing quote that's not escaped
+                in_escape = False
+                nesting_level = 0
+                start_pos = content_match.end()  # Position after the opening quote
+                
+                for i in range(start_pos, len(text)):
+                    char = text[i]
+                    
+                    if char == '\\':
+                        in_escape = not in_escape
+                        continue
+                    
+                    if not in_escape and char == quote_char:
+                        # Found potential closing quote
+                        if i + 1 < len(text) and text[i+1:].lstrip().startswith('with style'):
+                            # This is likely the end of content if followed by style directive
+                            directives["content"] = text[start_pos:i]
+                            break
+                        elif i + 1 == len(text) or not text[i+1].isalnum():
+                            # This is likely the end if it's the end of string or followed by non-alphanum
+                            directives["content"] = text[start_pos:i]
+                            break
+                    
+                    in_escape = False
+            
+    return directives
+
+def get_remaining_text(text, directives):
+    """
+    Get the text with all known directives removed.
+    
+    Args:
+        text: Original text
+        directives: Dictionary of extracted directives
+        
+    Returns:
+        Text with directives removed
+    """
+    result = text
+    
+    # More robust patterns to remove both single and double quoted content
+    to_remove = [
+        # Content patterns with both quote types and handling nested content
+        r'content\s+"(?:[^"\\]|\\.)*"',
+        r"content\s+'(?:[^'\\]|\\.)*'",
+        # Style patterns
+        r'with\s+style\s+"[^"]+"',
+        r"with\s+style\s+'[^']+'",
+        r'style\s+"[^"]+"',
+        r"style\s+'[^']+'",
+        # Text patterns
+        r'text\s+"[^"]+"',
+        r"text\s+'[^']+'",
+        # Class patterns
+        r'class\s+[a-zA-Z0-9_-]+',
+        r'class\s+"[^"]+"',
+        r"class\s+'[^']+'",
+        # Other attributes with both quote types
+        r'href\s+"[^"]+"', r"href\s+'[^']+'",
+        r'src\s+"[^"]+"', r"src\s+'[^']+'",
+        r'alt\s+"[^"]+"', r"alt\s+'[^']+'",
+        r'type\s+"[^"]+"', r"type\s+'[^']+'",
+        r'placeholder\s+"[^"]+"', r"placeholder\s+'[^']+'",
+    ]
+    
+    # Remove each pattern
+    for pattern in to_remove:
+        result = re.sub(pattern, '', result)
+    
+    # Clean up extra whitespace
+    result = re.sub(r'\s+', ' ', result).strip()
+    
+    # Handle any HTML tag remnants that might be causing problems
+    result = re.sub(r'</div>$', '', result)  # Remove trailing </div> that might be part of content
+    result = re.sub(r'</?[a-z][^>]*>', '', result)  # Remove stray HTML tags
+    
+    return result
 
 def process_ai_tags(html_content: str) -> str:
     """
@@ -768,8 +931,127 @@ def process_ai_tags(html_content: str) -> str:
     
     # Final pass with regex for any remaining AI tags
     # This handles any tags that might be part of attributes or not properly parsed
-    processed_html = re.sub(r'<ai([^>]*)>(.*?)</ai[^>]*>', r'<div class="ai-generated">\2</div>', processed_html, flags=re.DOTALL)
-    processed_html = re.sub(r'<ai([^>]*)/>', r'<div class="ai-generated"></div>', processed_html)
+    def replace_ai_tag(match):
+        tag_attrs = match.group(1)
+        tag_content = match.group(2)
+        
+        # Extract directives using our helper function
+        directives = extract_directives(tag_content)
+        
+        # Determine style attribute
+        style_attr = f' aicss="{directives["style"]}"' if "style" in directives else ""
+        
+        # Determine content with better handling
+        if "content" in directives:
+            # Use explicitly defined content
+            content = directives["content"]
+            
+            # Remove any HTML tag debris that might not belong
+            content = re.sub(r'</div>\s*$', '', content)  # Remove trailing </div>
+            
+            # Check if content ends with style directive and fix if needed
+            if "style" in directives:
+                style_text = directives["style"]
+                if content.endswith(f'with style "{style_text}"') or content.endswith(f"with style '{style_text}'"):
+                    content = content[:-(len(f'with style "{style_text}"'))]
+                elif content.endswith(f'style "{style_text}"') or content.endswith(f"style '{style_text}'"):
+                    content = content[:-(len(f'style "{style_text}"'))]
+        elif "text" in directives:
+            # Use text as content if available
+            content = directives["text"]
+        else:
+            # Use remaining text after removing known directives
+            content = get_remaining_text(tag_content, directives)
+            # If nothing meaningful remains, provide a generic fallback
+            if not content or content.isspace():
+                content = "AI-generated content"
+        
+        return f'<div{style_attr}>{content}</div>'
+    
+    # First fix any known common issues that cause problems
+    html_soup = BeautifulSoup(processed_html, 'html.parser')
+    
+    # Apply the improved replacement function - use a non-greedy pattern to better handle nested tags
+    processed_html = re.sub(r'<ai([^>]*)>(.*?)</ai[^>]*?>', replace_ai_tag, processed_html, flags=re.DOTALL)
+    
+    # Handle self-closing AI tags more robustly
+    processed_html = re.sub(r'<ai([^/>]*)/>', r'<div class="ai-generated"></div>', processed_html)
+    
+    # Handle complex processing by using a safer final-pass approach
+    # Create a new soup parsing with 'html5lib' for better error recovery
+    try:
+        final_soup = BeautifulSoup(processed_html, 'html5lib')
+        
+        # Look for and fix specific problem patterns in the final HTML
+        
+        # 1. Fix classes with HTML entities
+        for element in final_soup.find_all(lambda tag: tag.name and tag.get('class') and '&lt;/div' in ' '.join(tag.get('class', []))):
+            element['class'] = [c for c in element.get('class', []) if '&lt;' not in c]
+        
+        # 2. Fix elements with content + style text inside them
+        for element in final_soup.find_all(string=lambda text: text and '" with style "' in text):
+            # Get the parent element
+            parent = element.parent
+            if parent:
+                # Extract the style from the element text
+                style_match = re.search(r'with style "([^"]+)"', element)
+                if style_match:
+                    style_text = style_match.group(1)
+                    # Set the aicss attribute
+                    parent['aicss'] = style_text
+                    # Clean up the element text
+                    new_text = re.sub(r'\s*with style "([^"]+)"', '', element)
+                    element.replace_with(new_text)
+        
+        # 3. Fix single-quoted version
+        for element in final_soup.find_all(string=lambda text: text and "' with style '" in text):
+            parent = element.parent
+            if parent:
+                style_match = re.search(r"with style '([^']+)'", element)
+                if style_match:
+                    style_text = style_match.group(1)
+                    parent['aicss'] = style_text
+                    new_text = re.sub(r"\s*with style '([^']+)'", '', element)
+                    element.replace_with(new_text)
+                    
+        # 4. Fix "content" text fragments
+        for element in final_soup.find_all(string=lambda text: text and text.strip().startswith('content "')):
+            parent = element.parent
+            if parent:
+                # Try to extract the content between quotes
+                content_match = re.search(r'content "([^"]*)"', element)
+                if content_match:
+                    content_text = content_match.group(1)
+                    new_text = re.sub(r'content "([^"]*)"', r'\1', element)
+                    element.replace_with(new_text)
+        
+        # Use the cleaned soup as the final HTML
+        processed_html = str(final_soup)
+        
+    except Exception as e:
+        # Fall back to regex-based cleaning if BeautifulSoup approach fails
+        logger.warning(f"Error using soup-based cleanup, falling back to regex: {e}")
+        
+        # Multiple passes of regex cleanup
+        for _ in range(3):  # Apply multiple passes to catch nested issues
+            # Fix HTML entities in class names
+            processed_html = re.sub(r'<([a-z]+) class="&lt;/div">', r'<\1>', processed_html)
+            processed_html = re.sub(r'<([a-z]+) class="&lt;/[a-z]+">', r'<\1>', processed_html)
+            
+            # Fix content with trailing style directives
+            processed_html = re.sub(r'"\s+with style "([^"]+)"</div>', r'</div>', processed_html)
+            processed_html = re.sub(r"'\s+with style '([^']+)'</div>", r'</div>', processed_html)
+            
+            # Fix duplicate quotes from complex nested content
+            processed_html = re.sub(r'content "([^"]*)" with style', r'content \1 with style', processed_html)
+            processed_html = re.sub(r"content '([^']*)' with style", r'content \1 with style', processed_html)
+            
+            # Fix stray closing div tags
+            processed_html = re.sub(r'</div>\s*"\s+with style', r'" with style', processed_html)
+            
+            # Fix any other common malformed patterns
+            processed_html = re.sub(r'<div>\s*content\s+"([^"]+)"\s+with style\s+"([^"]+)"', r'<div aicss="\2">\1', processed_html)
+            processed_html = re.sub(r'<div>\s*content\s+\'([^\']+)\'\s+with style\s+\'([^\']+)\'', r'<div aicss="\2">\1', processed_html)
     
     return processed_html
 

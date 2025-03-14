@@ -21,6 +21,9 @@ The test files cover the following aspects:
 5. `all_html_tags.html` - Tests every HTML tag with AI elements and attributes
 6. `css_testing.html` - Tests all CSS properties and values
 7. `recursive_ai_elements.html` - Tests recursive processing of AI elements
+8. `extreme_nesting.html` - Tests extremely deep nesting (7+ levels), complex attributes, and circular references
+9. `unusual_language.html` - Tests unusual natural language descriptions (colloquial terms, slang, metaphors, technical jargon, etc.)
+10. `performance_stress.html` - Tests performance with high-volume elements, extremely large content, and complex transformations
 
 ## Running the Tests
 

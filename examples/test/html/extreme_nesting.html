@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extremely Nested AI Elements</title>
+    <style>
+        /* Base styles */
+        body {
+            font-family: system-ui, sans-serif;
+            line-height: 1.5;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-container {
+            margin-bottom: 50px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        /* Add classes for the output to use */
+        .ai-generated, .ai-generated-wrapper, .level-marker {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Extreme Nesting and Complex Structures</h1>
+    <p>Testing the system with extremely complex nested structures and unusual patterns.</p>
+
+    <!-- Test 1: Deeply nested AI elements (10+ levels) -->
+    <div class="test-container">
+        <h2>10+ Levels of Nesting</h2>
+        <aidiv>content "
+            <div class='level-marker'>Level 1
+                <aidiv>content '
+                    <div class=\"level-marker\">Level 2
+                        <aidiv>content \"
+                            <div class='level-marker'>Level 3
+                                <aidiv>content \\\"
+                                    <div class=\\\"level-marker\\\">Level 4
+                                        <aidiv>content \\\\\\\"
+                                            <div class=\\\\\\\'level-marker\\\\\\\'>Level 5
+                                                <aidiv>content \\\\\\\\\\\\\\\"
+                                                    <div class=\\\\\\\\\\\\\\\"level-marker\\\\\\\\\\\\\\\">Level 6
+                                                        <aidiv>content \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+                                                            <div class=\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"level-marker\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\">Level 7
+                                                                <p>Successfully reached 7 levels of nesting</p>
+                                                            </div>
+                                                        \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+                                                        with style \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"background purple, padding small, border-radius small\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"</aidiv>
+                                                    </div>
+                                                \\\\\\\\\\\\\\\"
+                                                with style \\\\\\\\\\\\\\\"background indigo, padding small, border-radius small\\\\\\\\\\\\\\\"</aidiv>
+                                            </div>
+                                        \\\\\\\"
+                                        with style \\\\\\\"background blue, padding small, border-radius small\\\\\\\"</aidiv>
+                                    </div>
+                                \\\"
+                                with style \\\"background green, padding small, border-radius small\\\"</aidiv>
+                            </div>
+                        \"
+                        with style \"background yellow, padding small, border-radius small\"</aidiv>
+                    </div>
+                '
+                with style 'background orange, padding small, border-radius small'</aidiv>
+            </div>
+        " with style "background red, padding medium, border-radius medium"</aidiv>
+    </div>
+
+    <!-- Test 2: Mixed nesting with different AI element types -->
+    <div class="test-container">
+        <h2>Mixed Element Types Nesting</h2>
+        <aidiv>content "
+            <div>
+                <h3>Mixed Container</h3>
+                <aibutton>text 'Toggle Panel' with style 'background teal, color white, padding medium, font-weight bold'</aibutton>
+                <aidiv>content '
+                    <div>
+                        <h4>Nested Panel</h4>
+                        <p>Panel content</p>
+                        <aibutton>text \"Nested Button\" with style \"background coral, color white, padding small\"</aibutton>
+                        <aitextarea>placeholder \"Enter details here...\" with style \"width 100%, height 80px, border light gray, padding small, margin top medium\"</aitextarea>
+                        <aip>text \"This is a custom paragraph with <em>emphasized text</em> and <strong>strong text</strong>\" with style \"color navy, font-size medium, line-height 1.8\"</aip>
+                    </div>
+                ' with style 'background white, box-shadow 0 4px 8px rgba(0,0,0,0.1), padding large, margin top medium'</aidiv>
+            </div>
+        " with style "background gray, padding medium, border-radius medium"</aidiv>
+    </div>
+
+    <!-- Test 3: Circular references (element inside itself) -->
+    <div class="test-container">
+        <h2>Circular References</h2>
+        <aidiv>content "
+            <div>
+                <h3>Parent Container</h3>
+                <p>This contains a reference to itself, which shouldn't cause infinite recursion</p>
+                <aidiv>content '
+                    <div>
+                        <h4>Child Container</h4>
+                        <p>This is a child container</p>
+                        <aidiv>content \"Same as above, which shouldn\\'t cause infinite recursion\"</aidiv>
+                    </div>
+                ' with style 'background whitesmoke, padding medium, border 1px dashed gray'</aidiv>
+            </div>
+        " with style "background lavender, padding large, border-radius medium"</aidiv>
+    </div>
+
+    <!-- Test 4: Mismatched tags and quotes -->
+    <div class="test-container">
+        <h2>Mismatched Tags and Quotes</h2>
+        <aidiv>content "
+            <div>
+                <h3>Mismatched Elements Test</h3>
+                <p>This contains elements with potentially problematic tag/quote matching</p>
+                <aibutton>text 'Button with \" inside' with style 'background crimson, color white, padding medium'</aibutton>
+                <aip>text 'Paragraph with mismatched <strong>bold text</em>' with style 'color forestgreen'</aip>
+                <div aicss=\"nested style with 'mixed quotes'\">Nested element with aicss</div>
+                <span aicss='another style with \"double quotes inside\"'>Mixed quotes in attribute</span>
+            </div>
+        " with style "background beige, padding large, border 1px solid tan"</aidiv>
+    </div>
+
+    <!-- Test 5: Deeply interleaved regular HTML and AI elements -->
+    <div class="test-container">
+        <h2>Interleaved HTML and AI Elements</h2>
+        <div class="grid" aicss="display grid, grid-template-columns repeat(3, 1fr), gap medium">
+            <div class="grid-item" aicss="background lightblue, padding medium">
+                <h3>Grid Item 1</h3>
+                <aibutton>text "Click me" with style "background salmon, color white, width 100%"</aibutton>
+                <ul aicss="margin top medium, padding left large">
+                    <li aicss="margin bottom small">Item <aia>href "#" text "with link" with style "color blue"</aia> inside</li>
+                    <li aicss="margin bottom small">Item with <aispan>text "styled text" with style "color purple, font-weight bold"</aispan></li>
+                    <li aicss="margin bottom small">Regular item</li>
+                </ul>
+            </div>
+            <div class="grid-item" aicss="background lightgreen, padding medium">
+                <h3>Grid Item 2</h3>
+                <div aicss="position relative, height 200px">
+                    <aidiv>content "<div aicss=\"position absolute, top 20px, left 20px, background white, padding small\">Positioned div 1</div>" with style "position absolute, top 50px, left 50px, background rgba(255,255,255,0.8), padding small, box-shadow 0 2px 4px rgba(0,0,0,0.2)"</aidiv>
+                    <div aicss="position absolute, bottom 20px, right 20px, background white, padding small, border-radius small">
+                        <aibutton>text "Nested Button" with style "background teal, color white, padding tiny, font-size small"</aibutton>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-item" aicss="background lightyellow, padding medium">
+                <h3>Grid Item 3</h3>
+                <aidiv>content "
+                    <form>
+                        <aiinput>type \"text\" placeholder \"Nested input\" with style \"width 100%, margin bottom small\"</aiinput>
+                        <div aicss=\"display flex, justify-content space-between\">
+                            <aibutton>text \"Cancel\" with style \"background gray, color white, padding small\"</aibutton>
+                            <aibutton>text \"Submit\" with style \"background green, color white, padding small\"</aibutton>
+                        </div>
+                    </form>
+                " with style "background white, padding medium, border 1px solid #ddd, border-radius small"</aidiv>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test 6: AI elements with extremely complex attributes -->
+    <div class="test-container">
+        <h2>Complex Attributes</h2>
+        <aidiv>content "
+            <div data-complex='{\"key\":\"value\",\"nested\":{\"array\":[1,2,3]}}' data-more='[\"item1\",\"item2\"]' data-info=\"Line 1
+Line 2
+Line 3\" data-html=\"<div><p>Nested HTML</p></div>\" class=\"multiple classes with-dash _underscore\" id=\"complex-id-1234\">
+                <h3>Element with Complex Attributes</h3>
+                <p>This element has JSON, arrays, and multiline attributes</p>
+                <aibutton data-special='Special \"quoted\" attribute' type=\"button\" disabled aria-pressed=\"true\">text \"Special Button\" with style \"background #8a2be2, color white, padding medium, border-radius pill\"</aibutton>
+            </div>
+        " with style "background floralwhite, padding large, border 1px solid #ddd"</aidiv>
+    </div>
+
+    <!-- Test 7: Completely invalid or nonsensical AI tags -->
+    <div class="test-container">
+        <h2>Invalid Elements</h2>
+        <!-- Invalid tag that only partially looks like an AI tag -->
+        <ai-not-real>This is not a valid AI tag but looks similar</ai-not-real>
+        
+        <!-- Tag with invalid attributes -->
+        <aibutton text="Missing quotes" style=unquoted>Invalid attribute format</aibutton>
+        
+        <!-- Completely invalid tag structure -->
+        <aidiv>No proper content or style attributes at all</aidiv>
+        
+        <!-- Empty self-closing tag -->
+        <aiimg/>
+        
+        <!-- Tag with conflicting attributes -->
+        <aibutton text="One text" with style="background blue, color white">text "Another text" with style "background red, color black"</aibutton>
+        
+        <!-- Nested invalid tags -->
+        <aidiv>content "<aiinvalid>Not a real tag</aiinvalid>" with style "padding medium"</aidiv>
+    </div>
+</body>
+</html>

@@ -668,53 +668,110 @@ def process_ai_tags(html_content: str) -> str:
             if head:
                 head.append(style_tag)
     
-    # Find all <aihtml> tags
-    aihtml_tags = soup.find_all('aihtml')
-    for tag in aihtml_tags:
-        description = tag.string.strip() if tag.string else ""
-        if description:
-            # Generate HTML from the description
-            generated_html = generate_html_from_description(description)
-            # Replace the <aihtml> tag with the generated HTML
-            new_content = BeautifulSoup(generated_html, 'html.parser')
-            # Replace with the contents of the new_content, not the entire document
-            tag.replace_with(new_content)
-    
-    # Process each custom AI tag using a more reliable approach
-    for tag_name in [tag.name for tag in soup.find_all() if tag.name and tag.name.startswith('ai') and 
-                     tag.name not in ['aihtml', 'aistyle']]:
-        # Find all tags with this name
-        for tag in soup.find_all(tag_name):
-            # Get the content/description from the tag
+    # Process all HTML content in multiple passes to handle nested AI tags
+    def process_html_recursively(html_content, max_depth=5, current_depth=0):
+        """Process HTML content recursively to handle nested AI tags."""
+        if current_depth >= max_depth:
+            # Avoid infinite recursion
+            return html_content
+            
+        soup = BeautifulSoup(html_content, 'html.parser')
+        has_changes = False
+        
+        # First process <aihtml> tags
+        aihtml_tags = soup.find_all('aihtml')
+        for tag in aihtml_tags:
             description = tag.string.strip() if tag.string else ""
             if description:
-                # Generate HTML based on the tag type and description
-                generated_html = generate_html_from_tag(tag.name, description)
-                # Parse the generated HTML
+                # Generate HTML from the description
+                generated_html = generate_html_from_description(description)
+                # Replace the <aihtml> tag with the generated HTML
                 new_content = BeautifulSoup(generated_html, 'html.parser')
-                
-                # Extract the first element from the new content
-                if new_content.contents:
-                    if len(new_content.contents) == 1 and new_content.contents[0].name:
-                        # Replace with single element
-                        tag.replace_with(new_content.contents[0])
+                tag.replace_with(new_content)
+                has_changes = True
+        
+        # Then process other AI tags
+        for tag_name in [tag.name for tag in soup.find_all() if tag.name and tag.name.startswith('ai') and 
+                        tag.name not in ['aistyle']]:
+            # Find all tags with this name
+            for tag in soup.find_all(tag_name):
+                # Get the content/description from the tag
+                description = tag.string.strip() if tag.string else ""
+                if description:
+                    # Generate HTML based on the tag type and description
+                    generated_html = generate_html_from_tag(tag.name, description)
+                    # Parse the generated HTML
+                    new_content = BeautifulSoup(generated_html, 'html.parser')
+                    
+                    # Extract elements from the new content
+                    if new_content.contents:
+                        if len(new_content.contents) == 1 and new_content.contents[0].name:
+                            # Replace with single element
+                            tag.replace_with(new_content.contents[0])
+                        else:
+                            # If there are multiple elements, handle them
+                            wrapper = soup.new_tag('div')
+                            wrapper['class'] = 'ai-generated-wrapper'
+                            
+                            # Move content to wrapper
+                            for content in new_content.contents:
+                                if hasattr(content, 'name') and content.name:
+                                    wrapper.append(content)
+                            
+                            # Replace tag with wrapper
+                            tag.replace_with(wrapper)
                     else:
-                        # If there are multiple elements, handle them
-                        wrapper = soup.new_tag('div')
-                        wrapper['class'] = 'ai-generated-wrapper'
+                        # If no content, use a placeholder div
+                        placeholder = soup.new_tag('div')
+                        placeholder['class'] = 'ai-generated'
+                        tag.replace_with(placeholder)
+                    
+                    has_changes = True
+                elif tag.get('with') and 'style' in tag.get('with'):
+                    # Handle self-closing tags with style attribute
+                    style_match = re.search(r'style\s*=\s*["\']([^"\']+)["\']', tag.get('with'))
+                    if style_match:
+                        style_value = style_match.group(1)
+                        # Create a div with the style
+                        div = soup.new_tag('div')
+                        div['class'] = 'ai-generated'
+                        div['style'] = f"/* AI Style: {style_value} */"
                         
-                        # Move content to wrapper
-                        for content in new_content.contents:
-                            if hasattr(content, 'name') and content.name:
-                                wrapper.append(content)
+                        # Copy any other attributes
+                        for attr, value in tag.attrs.items():
+                            if attr != 'with' and attr != 'style':
+                                div[attr] = value
                         
-                        # Replace tag with wrapper
-                        tag.replace_with(wrapper)
-                else:
-                    # If no content, just remove the tag
-                    tag.extract()
+                        tag.replace_with(div)
+                        has_changes = True
+        
+        # Also handle self-closing AI tags
+        for tag in soup.find_all(lambda tag: tag.name and tag.name.startswith('ai') and tag.is_empty_element):
+            # Create a div replacement
+            div = soup.new_tag('div')
+            div['class'] = 'ai-generated'
+            # Copy attributes
+            for attr, value in tag.attrs.items():
+                if attr != 'style':
+                    div[attr] = value
+            tag.replace_with(div)
+            has_changes = True
+        
+        # If changes were made, process again to handle newly revealed AI tags
+        if has_changes and current_depth < max_depth - 1:
+            return process_html_recursively(str(soup), max_depth, current_depth + 1)
+        
+        return str(soup)
     
-    return str(soup)
+    # Process the HTML content recursively
+    processed_html = process_html_recursively(str(soup), max_depth=5)
+    
+    # Final pass with regex for any remaining AI tags
+    # This handles any tags that might be part of attributes or not properly parsed
+    processed_html = re.sub(r'<ai([^>]*)>(.*?)</ai[^>]*>', r'<div class="ai-generated">\2</div>', processed_html, flags=re.DOTALL)
+    processed_html = re.sub(r'<ai([^>]*)/>', r'<div class="ai-generated"></div>', processed_html)
+    
+    return processed_html
 
 
 def minify_html_file(input_file: str, output_file: str) -> bool:

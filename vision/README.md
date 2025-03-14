@@ -1,0 +1,1 @@
+This is a visual HTML/CSS maker web-app, that uses draggable boxes with labels to generate <ai*> instruction tags, and then compiles them in real-time and returns the output in a preview pane on the right.

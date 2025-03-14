@@ -25,7 +25,7 @@ Natural language AI machine learning CSS compiler/transpiler with watch mode.
 
 Use MCPs only when more efficient than standard tools:
 
-- **Filesystem MCP**: Use for bulk operations (listing directories, recursive searches) or when searching for patterns across many files. Use standard View/Edit tools for individual file operations. Do not use to write files.
+- **Filesystem MCP**: Use for bulk operations (listing directories, recursive searches) or when searching for patterns across many files, or deleting or moving files. Use standard View/Edit tools for viewing and writing to files. Do not use the MCP to WRITE files.
 
 - **GitHub MCP**: Only use for GitHub operations; prefer standard tools for local operations.
 
@@ -39,14 +39,8 @@ Use MCPs only when more efficient than standard tools:
 
 ## Behaviour
 
-Be proactive and helpful. While you're performing tasks, also consider other tasks that might be relevant and useful to perform, and complete them as well. Take initiative.
-
-If you're not sure about something, make the most rational assumption and take action, but if there is no clear answer or path forward, consult the user for clarification.
-
 Begin your first action by understanding the codebase, starting with the .cursor/rules/*.mdc files, and then the README.md file, and following directions from there.
 
 At the end of every lengthy response, consider all of the actions you took in the last steps since you last updated the CLAUDE.md file. Assess whether there are any important notes or memories you wish to store, and store those in your graph memory structure using the MCP. Also determine whether we need to make any additions to the CLAUDE.md file in terms of short, behavioural adjustments, tweaks, or additions. If so, add them to the file.
-
-If any of our core dependencies change, add them (or adjust them) in our CLAUDE.md file.
 
 If executing python code, make sure you've activated the venv first in this root project directory.

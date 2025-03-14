@@ -75,13 +75,8 @@ try:
 except Exception:
     pass  # Silently fail if something goes wrong with the monkey patching
 
-from .ml.engine import nl_to_css_fast, initialize_engine, download_models, models_are_downloaded
-from .ml.html_processor import (
-    extract_and_process,
-    process_html_file,
-    process_directory,
-    minify_html_file
-)
+# Lazy import ML components - do not import at module level
+# This allows the help command to run without loading models
 
 
 @click.group()
@@ -96,6 +91,9 @@ def main():
 @click.option('--selector', '-s', default='element', help='CSS selector to use')
 def generate(description, selector):
     """Generate CSS from natural language description."""
+    # Lazily import ML components only when needed
+    from .ml.engine import initialize_engine, nl_to_css_fast
+    
     # Initialize the ML engine
     initialize_engine()
     
@@ -124,6 +122,10 @@ def process(input_path, output_path, verbose, disable_progress, max_passes):
     - Processes <ai*> tags (aibutton, aidiv, aip, etc.)
     - Converts aicss attributes to real CSS classes
     """
+    # Lazily import ML components only when needed
+    from .ml.engine import initialize_engine
+    from .ml.html_processor import extract_and_process
+    
     # Make sure progress bars are disabled
     import os
     if disable_progress:
@@ -133,8 +135,6 @@ def process(input_path, output_path, verbose, disable_progress, max_passes):
     try:
         initialize_engine()
         
-        # Enable multiple passes of processing to handle nested AI tags
-        from .ml.html_processor import extract_and_process
         current_input = input_path
         temp_output = None
         final_output = output_path
@@ -196,6 +196,9 @@ def process(input_path, output_path, verbose, disable_progress, max_passes):
 @click.argument('output_file', type=click.Path())
 def minify(input_file, output_file):
     """Minify an HTML file."""
+    # Lazily import ML components only when needed
+    from .ml.html_processor import minify_html_file
+    
     success = minify_html_file(input_file, output_file)
     if success:
         click.echo(f"Minified HTML saved to {output_file}")
@@ -245,17 +248,27 @@ class FileChangeHandler(FileSystemEventHandler):
                     self.pending_files.remove(file_path)
                     continue
                 
-                # Determine output path
-                if self.output_dir:
-                    rel_path = os.path.relpath(file_path, self.directory)
-                    out_file = os.path.join(self.output_dir, rel_path)
-                else:
-                    out_file = None
-                
-                # Process the file
-                click.echo(f"Processing {file_path}")
-                _, styles = process_html_file(file_path, out_file)
-                click.echo(f"Extracted {len(styles)} style descriptions")
+                try:
+                    # Lazily import process_html_file only when needed
+                    from .ml.html_processor import process_html_file
+                    
+                    # Determine output path
+                    if self.output_dir:
+                        rel_path = os.path.relpath(file_path, self.directory)
+                        out_file = os.path.join(self.output_dir, rel_path)
+                        # Create parent directory if it doesn't exist
+                        os.makedirs(os.path.dirname(out_file), exist_ok=True)
+                    else:
+                        out_file = None
+                    
+                    # Process the file
+                    click.echo(f"Processing {file_path}")
+                    _, styles = process_html_file(file_path, out_file)
+                    click.echo(f"Extracted {len(styles)} style descriptions")
+                except ImportError as e:
+                    click.echo(f"Error importing required module: {e}", err=True)
+                except Exception as e:
+                    click.echo(f"Error processing {file_path}: {e}", err=True)
                 
                 # Remove from pending files
                 self.pending_files.remove(file_path)
@@ -273,6 +286,9 @@ class FileChangeHandler(FileSystemEventHandler):
 @click.option('--output', '-o', type=click.Path(), help='Output directory path')
 def watch(directory, output):
     """Watch a directory for HTML file changes and process them automatically."""
+    # Lazily import ML components only when needed
+    from .ml.engine import initialize_engine
+    
     # Initialize the ML engine
     initialize_engine()
     
@@ -305,6 +321,9 @@ def watch(directory, output):
 @click.option('--model-dir', type=click.Path(), help='Custom directory to store models')
 def download(force, model_dir):
     """Download ML models for offline use."""
+    # Lazily import ML components only when needed
+    from .ml.engine import models_are_downloaded, download_models
+    
     if not force and models_are_downloaded():
         click.echo("Models already downloaded. Use --force to re-download.")
         return
@@ -321,6 +340,9 @@ def download(force, model_dir):
 @main.command()
 def benchmark():
     """Run a benchmark to test processing speed."""
+    # Lazily import ML components only when needed
+    from .ml.engine import initialize_engine, nl_to_css_fast
+    
     # Test descriptions
     descriptions = [
         "blue background, white text, rounded corners",
